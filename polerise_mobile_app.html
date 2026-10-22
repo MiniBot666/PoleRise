@@ -1,0 +1,3148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PoleRise - Progreso & Comunidad Pole Dance</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        :root {
+            --bg-main: #f2f0f8;
+            --bg-container: #F4F3F8;
+            --bg-card: #FFFFFF;
+            --text-primary: #1F2024;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --sub-bg: #F9FAFB;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .soft-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(180, 170, 205, 0.25), 0 8px 10px -6px rgba(180, 170, 205, 0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .soft-card:active {
+            transform: scale(0.98);
+        }
+
+        .bg-pastel-violet { background-color: #C8B6FF; }
+        .text-pastel-violet { color: #5B3B83; }
+        .bg-pastel-pink { background-color: #FFC2D1; }
+        .bg-pastel-blue { background-color: #BEE1E6; }
+        
+        .accent-gradient {
+            background: linear-gradient(135deg, #C8B6FF 0%, #E7C6FF 100%);
+        }
+
+        .floating-nav {
+            background-color: #18181B;
+            box-shadow: 0 20px 30px rgba(24, 24, 27, 0.35);
+        }
+
+        .mobile-container {
+            max-width: 420px;
+            min-height: 100vh;
+            margin: 0 auto;
+            background-color: var(--bg-container);
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @media (min-width: 640px) {
+            body {
+                padding: 20px 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+            }
+            .mobile-container {
+                min-height: 844px;
+                max-height: 850px;
+                border-radius: 44px;
+                border: 10px solid #18181B;
+            }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+
+        <!-- Impersonation Mode Banner -->
+        <div id="impersonateBanner" class="hidden bg-amber-500 text-black text-xs font-bold px-4 py-1.5 flex justify-between items-center z-40">
+            <span class="flex items-center gap-1.5">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                Modo Consulta: <span id="impersonateUserEmail" class="underline">usuario@polerise.app</span>
+            </span>
+            <button onclick="exitImpersonation()" class="bg-black text-white px-2 py-0.5 rounded-md text-[10px] font-medium uppercase tracking-wider">
+                Salir
+            </button>
+        </div>
+
+        <!-- VIEWS WRAPPER -->
+        <div id="viewsWrapper" class="flex-1 overflow-y-auto no-scrollbar pb-28 px-5 pt-3">
+
+            <!-- 0. LANDING / AUTH VIEW -->
+            <div id="authView" class="min-h-[720px] flex flex-col justify-between py-6">
+                <div class="text-center pt-8 cursor-pointer" onclick="handleSecretLogoTap()">
+                    <div class="w-20 h-20 bg-pastel-violet rounded-3xl mx-auto flex items-center justify-center shadow-lg shadow-purple-200 mb-4 transform rotate-3 active:scale-95 transition">
+                        <i data-lucide="sparkles" class="w-10 h-10 text-purple-900"></i>
+                    </div>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">PoleRise</h1>
+                    <p class="text-sm font-medium text-gray-500 mt-1">Supera la gravedad, registra tu elevación.</p>
+                </div>
+
+                <!-- LOGIN CARD -->
+                <div id="loginCard" class="soft-card p-6 my-auto space-y-4">
+                    <h2 class="text-lg font-bold text-gray-800 text-center mb-2">Iniciar Sesión</h2>
+                    
+                    <button type="button" onclick="loginUser('Valeria Gomez')" class="w-full bg-white border border-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-2xl flex items-center justify-center gap-3 shadow-sm hover:bg-gray-50 active:scale-95 transition cursor-pointer">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        </svg>
+                        Continuar con Google
+                    </button>
+
+                    <div class="flex items-center my-3">
+                        <div class="flex-1 border-t border-gray-200"></div>
+                        <span class="px-3 text-xs text-gray-400 font-medium">o con correo</span>
+                        <div class="flex-1 border-t border-gray-200"></div>
+                    </div>
+
+                    <form onsubmit="return handleEmailLogin(event)" class="space-y-3">
+                        <div>
+                            <input type="email" id="emailInput" placeholder="Correo electrónico" class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300">
+                        </div>
+                        <div>
+                            <input type="password" id="passwordInput" placeholder="Contraseña" class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300">
+                        </div>
+                        <button type="submit" class="w-full bg-pastel-violet text-purple-950 font-bold py-3.5 rounded-2xl shadow-md hover:opacity-95 active:scale-95 transition cursor-pointer">
+                            Entrar a PoleRise
+                        </button>
+                    </form>
+
+                    <div class="text-center pt-2">
+                        <button onclick="toggleRegisterView(true)" class="text-xs text-purple-900 font-bold hover:underline">
+                            ¿No tienes cuenta? Regístrate aquí
+                        </button>
+                    </div>
+                </div>
+
+                <!-- REGISTER CARD -->
+                <div id="registerCard" class="soft-card p-6 my-auto space-y-3 hidden">
+                    <h2 class="text-lg font-bold text-gray-800 text-center mb-1">Crear Cuenta en PoleRise</h2>
+                    <p class="text-xs text-gray-400 text-center mb-2">Únete a nuestra comunidad de Pole Dancers 💕</p>
+
+                    <form onsubmit="return handleUserRegistration(event)" class="space-y-2.5">
+                        <div>
+                            <input type="text" id="regNameInput" placeholder="Nombre completo" required class="w-full bg-gray-50 border border-gray-100 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-purple-300">
+                        </div>
+                        <div>
+                            <input type="text" id="regHandleInput" oninput="validateHandleUniqueness(this)" placeholder="Usuario (@ejemplo)" required class="w-full bg-gray-50 border border-gray-100 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-purple-300">
+                            <span id="handleErrorMsg" class="text-[10px] text-rose-500 font-bold hidden block mt-0.5">Este nombre de usuario ya está registrado por otra usuaria.</span>
+                        </div>
+                        <div>
+                            <input type="email" id="regEmailInput" placeholder="Correo electrónico" required class="w-full bg-gray-50 border border-gray-100 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-purple-300">
+                        </div>
+                        <div>
+                            <input type="password" id="regPasswordInput" placeholder="Contraseña" required class="w-full bg-gray-50 border border-gray-100 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-purple-300">
+                        </div>
+                        <div>
+                            <select id="regRoleInput" class="w-full bg-gray-50 border border-gray-100 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-purple-300 text-gray-700">
+                                <option value="Alumna / Practicante">Alumna / Practicante</option>
+                                <option value="Instructora / Maestra">Instructora / Maestra</option>
+                                <option value="Atleta Profesional">Atleta Profesional</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" id="regSubmitBtn" class="w-full bg-pastel-violet text-purple-950 font-bold py-3 rounded-2xl shadow-md hover:opacity-95 active:scale-95 transition cursor-pointer text-xs">
+                            Completar Registro
+                        </button>
+                    </form>
+
+                    <div class="text-center pt-2">
+                        <button onclick="toggleRegisterView(false)" class="text-xs text-purple-900 font-bold hover:underline">
+                            ¿Ya tienes cuenta? Inicia Sesión
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <p class="text-xs text-gray-400 cursor-pointer select-none" onclick="handleSecretLogoTap()">PoleRise Mobile App • v2.0.0</p>
+                </div>
+            </div>
+
+            <!-- 1. HOME / DASHBOARD VIEW -->
+            <div id="homeView" class="hidden space-y-5">
+                <div class="flex justify-between items-center pt-2">
+                    <div>
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Bienvenida</span>
+                        <h2 id="welcomeUser" class="text-2xl font-bold text-gray-900">Hola, Valeria ✨</h2>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openOnboardingModal()" class="w-9 h-9 rounded-2xl bg-purple-100 text-purple-900 flex items-center justify-center shadow-sm" title="Guía de Inicio">
+                            <i data-lucide="help-circle" class="w-5 h-5"></i>
+                        </button>
+                        <div onclick="switchTab('profile')" class="w-11 h-11 rounded-2xl bg-pastel-pink p-0.5 shadow-sm overflow-hidden flex items-center justify-center cursor-pointer">
+                            <img id="homeAvatarImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="w-full h-full object-cover rounded-2xl" alt="Avatar">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="soft-card p-5 accent-gradient text-purple-950 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start">
+                            <span class="bg-white/60 text-purple-900 text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Entrenamiento Sugerido</span>
+                            <button onclick="switchTab('progress')" class="bg-white/80 hover:bg-white text-purple-950 text-[11px] font-extrabold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm transition">
+                                <i data-lucide="list-checks" class="w-3.5 h-3.5"></i> Mis Rutinas
+                            </button>
+                        </div>
+                        <h3 class="text-lg font-extrabold mt-2">Calentamiento Hombros & Espalda</h3>
+                        <p class="text-xs text-purple-900/80 mt-1 max-w-[220px]">Activación articular de 10 min + práctica progresiva en barra.</p>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="startWorkoutRoutine('Calentamiento Hombros & Espalda')" class="bg-purple-950 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md flex items-center gap-2 hover:bg-black transition">
+                                <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Iniciar Rutina
+                            </button>
+                            <button onclick="startFreePoleSession()" class="bg-white/90 text-purple-950 text-xs font-bold px-3 py-2.5 rounded-xl shadow-md flex items-center gap-1.5 hover:bg-white transition">
+                                <i data-lucide="timer" class="w-3.5 h-3.5"></i> Práctica Libre
+                            </button>
+                        </div>
+                    </div>
+                    <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-white/20 rounded-full blur-xl pointer-events-none"></div>
+                </div>
+
+                <!-- Daily Tip Card -->
+                <div class="soft-card p-4 border border-purple-100 bg-white space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="bg-purple-100 text-purple-900 text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1 uppercase tracking-wider">
+                            <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-purple-700"></i> Consejo del Día
+                        </span>
+                        <button onclick="rotateDailyTip()" class="text-[10px] font-extrabold text-purple-800 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-lg flex items-center gap-1 transition">
+                            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Nuevo Consejo
+                        </button>
+                    </div>
+                    <h4 id="dailyTipTitle" class="text-xs font-bold text-gray-900 mt-1">Mejora tu Grip sin dañar tu piel</h4>
+                    <p id="dailyTipBody" class="text-xs text-gray-600 leading-relaxed">
+                        Limpia la barra con alcohol isopropílico antes de entrenar y aplica magnesio líquido solo en tus manos y corvas. Mantener la piel hidratada por las noches evitará moretones profundos.
+                    </p>
+                </div>
+
+                <!-- Progress Summary -->
+                <div>
+                    <h3 class="text-sm font-bold text-gray-700 mb-3 px-1">Tu Resumen de Avance</h3>
+                    <div class="grid grid-cols-2 gap-3.5">
+                        <div class="soft-card p-4 flex flex-col justify-between relative overflow-hidden">
+                            <div class="flex justify-between items-start">
+                                <div class="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                                    <i data-lucide="flame" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[11px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-full">+1 hoy</span>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-xs text-gray-400 font-medium">Rutinas Completadas</span>
+                                <p class="text-xl font-extrabold text-gray-900"><span id="completedRoutinesCount">14</span> <span class="text-xs font-normal text-gray-400">sesiones</span></p>
+                            </div>
+                        </div>
+
+                        <div class="soft-card p-4 bg-pastel-violet/30 flex flex-col justify-between relative">
+                            <div class="flex justify-between items-start">
+                                <div class="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-purple-700 shadow-sm">
+                                    <i data-lucide="award" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[11px] font-bold text-purple-800 bg-white/80 px-1.5 py-0.5 rounded-full">Progresando</span>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-xs text-purple-900/70 font-medium">Poses Logradas</span>
+                                <p class="text-xl font-extrabold text-purple-950"><span id="homePoseCount">3</span> <span class="text-xs font-normal text-purple-800/60">Poses</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. GLOSSARY VIEW -->
+            <div id="glossaryView" class="hidden space-y-4">
+                <div class="pt-2 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Glosario de Poses</h2>
+                        <p class="text-xs text-gray-400">Puntos de agarre, imágenes y demostraciones</p>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-gray-400"></i>
+                    <input type="text" id="searchGlossary" onkeyup="filterGlossary()" placeholder="Buscar pose (ej. Butterfly, Jade, Gemini)..." class="w-full bg-white border-0 shadow-sm rounded-2xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-purple-200">
+                </div>
+
+                <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+                    <button onclick="setGlossaryFilter('all')" class="filter-btn active px-3.5 py-1.5 rounded-full text-xs font-bold bg-purple-950 text-white shrink-0">Todos</button>
+                    <button onclick="setGlossaryFilter('principiante')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-gray-600 shrink-0">Principiante</button>
+                    <button onclick="setGlossaryFilter('intermedio')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-gray-600 shrink-0">Intermedio</button>
+                    <button onclick="setGlossaryFilter('avanzado')" class="filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-gray-600 shrink-0">Avanzado</button>
+                </div>
+
+                <div id="glossaryList" class="space-y-3 pt-1">
+                    <!-- Dynamic rendering via JS -->
+                </div>
+            </div>
+
+            <!-- 3. COMMUNITY VIEW -->
+            <div id="communityView" class="hidden space-y-4">
+                <div class="flex justify-between items-center pt-2">
+                    <div>
+                        <h2 class="text-xl font-bold">Social Pole Sisters 💕</h2>
+                        <p class="text-xs text-gray-400">Tutoriales, ayuda técnica y espacio social</p>
+                    </div>
+                    <button onclick="openNewPostModal()" class="bg-pastel-violet text-purple-950 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow-sm">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Publicar
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-1 bg-gray-200/60 p-1 rounded-2xl text-xs font-bold text-gray-500">
+                    <button onclick="switchCommunityTab('social')" id="commTab-social" class="py-2 rounded-xl text-purple-950 bg-white shadow-sm font-extrabold">Social</button>
+                    <button onclick="switchCommunityTab('ayuda')" id="commTab-ayuda" class="py-2 rounded-xl">Ayuda</button>
+                    <button onclick="switchCommunityTab('tutoriales')" id="commTab-tutoriales" class="py-2 rounded-xl">Tutoriales</button>
+                </div>
+
+                <div id="communityFeed" class="space-y-3.5">
+                    <!-- Dynamic rendering via JS -->
+                </div>
+            </div>
+
+            <!-- 4. CHAT VIEW -->
+            <div id="chatView" class="hidden space-y-4">
+                <div class="pt-2 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Chat & Amigas</h2>
+                        <p class="text-xs text-gray-400">Mensajes directos y solicitudes de amistad</p>
+                    </div>
+                    <button onclick="openFriendSearchModal()" class="bg-purple-950 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm flex items-center gap-1">
+                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Agregar Amiga
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-1 bg-gray-200/60 p-1 rounded-2xl text-xs font-bold text-gray-500">
+                    <button onclick="switchChatSubTab('chats')" id="chatSubTab-chats" class="py-2 rounded-xl text-purple-950 bg-white shadow-sm font-extrabold">Mensajes</button>
+                    <button onclick="switchChatSubTab('friends')" id="chatSubTab-friends" class="py-2 rounded-xl">Solicitudes / Amigas</button>
+                </div>
+
+                <div id="chatSubView-chats" class="space-y-2">
+                    <div id="chatsListContainer" class="space-y-2"></div>
+                </div>
+
+                <div id="chatSubView-friends" class="hidden space-y-3">
+                    <div class="soft-card p-3 space-y-2">
+                        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Solicitudes Pendientes</h4>
+                        <div id="pendingFriendsList" class="space-y-2"></div>
+                    </div>
+
+                    <div class="soft-card p-3 space-y-2">
+                        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Mis Amigas Pole</h4>
+                        <div id="acceptedFriendsList" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. PROGRESS VIEW -->
+            <div id="progressView" class="hidden space-y-4">
+                <div class="pt-2 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Mi Progreso & Rutinas</h2>
+                        <p class="text-xs text-gray-400">Tus rutinas personalizadas, estadísticas e historial</p>
+                    </div>
+                    <button onclick="toggleDetailedAnalyticsModal()" class="bg-purple-950 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm flex items-center gap-1">
+                        <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i> Estadísticas
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-1 bg-gray-200/70 p-1 rounded-2xl text-xs font-bold text-gray-500">
+                    <button onclick="switchProgressSubTab('routines')" id="progSubTab-routines" class="py-2 rounded-xl text-purple-950 bg-white shadow-sm font-extrabold transition-all">Mis Rutinas</button>
+                    <button onclick="switchProgressSubTab('achievements')" id="progSubTab-achievements" class="py-2 rounded-xl transition-all">Álbum de Logros</button>
+                </div>
+
+                <div id="progressSubView-routines" class="space-y-4">
+                    <div class="soft-card p-4 bg-purple-50/40 border border-purple-100 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-purple-200 text-purple-900 flex items-center justify-center">
+                                    <i data-lucide="list-checks" class="w-4 h-4"></i>
+                                </div>
+                                <h3 class="text-xs font-bold text-gray-900">Mis Rutinas Personalizadas</h3>
+                            </div>
+                            <button onclick="openCustomRoutineModal()" class="bg-purple-950 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-sm flex items-center gap-1">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Crear Nueva
+                            </button>
+                        </div>
+                        <div id="customRoutinesList" class="space-y-2"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="soft-card p-3 bg-purple-50/50">
+                            <span class="text-[10px] text-gray-400 block font-semibold">Pole Estático</span>
+                            <span class="text-base font-extrabold text-purple-950">22.5 hrs</span>
+                        </div>
+                        <div class="soft-card p-3 bg-pink-50/50">
+                            <span class="text-[10px] text-gray-400 block font-semibold">Pole Giratorio (Spin)</span>
+                            <span class="text-base font-extrabold text-pink-950">16.0 hrs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="progressSubView-achievements" class="hidden space-y-4">
+                    <div class="soft-card p-4 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-[11px] font-medium text-gray-400">Total Figuras Dominadas</span>
+                                <h3 id="totalAchievedText" class="text-2xl font-extrabold text-gray-900">3 Poses</h3>
+                            </div>
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                                <i data-lucide="trending-up" class="w-3 h-3"></i> +18% este mes
+                            </span>
+                        </div>
+
+                        <div class="h-36 w-full pt-2">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-700 mb-2.5">Álbum de Logros Desbloqueados</h3>
+                        <div class="grid grid-cols-2 gap-3" id="unlockedGallery"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. PROFILE VIEW -->
+            <div id="profileView" class="hidden space-y-4">
+                <div class="pt-2 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold cursor-pointer select-none" onclick="handleSecretLogoTap()">Mi Perfil</h2>
+                        <p class="text-xs text-gray-400">Personaliza tu cuenta, galería y estilo de Pole</p>
+                    </div>
+                    <div class="flex gap-1.5 items-center">
+                        <button onclick="openSavedPostsModal()" class="bg-purple-100 text-purple-950 text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm flex items-center gap-1">
+                            <i data-lucide="bookmark" class="w-3.5 h-3.5"></i> Guardados
+                        </button>
+                        <button onclick="openProfileEditModal()" class="bg-white border border-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm flex items-center gap-1">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="soft-card p-5 text-center space-y-3 relative">
+                    <div class="w-20 h-20 rounded-full bg-pastel-pink p-1 mx-auto relative shadow-sm">
+                        <img id="profileAvatarImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="w-full h-full object-cover rounded-full" alt="Profile">
+                        <span class="absolute bottom-0 right-0 bg-purple-950 text-white p-1 rounded-full shadow"><i data-lucide="sparkles" class="w-3 h-3"></i></span>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-center gap-1.5">
+                            <h3 id="profileNameDisplay" class="text-base font-bold">Valeria Gomez</h3>
+                            <span id="profileRoleTag" class="bg-amber-100 text-amber-900 text-[9px] font-extrabold px-2 py-0.5 rounded-full">Instructora</span>
+                        </div>
+                        <p id="profileHandleDisplay" class="text-xs text-gray-400 font-medium">@valeria.pole</p>
+                    </div>
+
+                    <p id="profileBioDisplay" class="text-xs text-gray-600 bg-gray-50 p-2.5 rounded-xl leading-relaxed">
+                        Apasionada del Spin Pole y flexibilidad. Entrenando para mi primera competencia 💜
+                    </p>
+
+                    <div class="flex justify-center gap-2 pt-1 flex-wrap">
+                        <span id="profileLevelBadge" class="bg-purple-100 text-purple-950 text-[10px] font-bold px-3 py-1 rounded-full">Nivel: Intermedio</span>
+                        <span id="profileStyleBadge" class="bg-pink-100 text-pink-900 text-[10px] font-bold px-3 py-1 rounded-full">Estilo: Spin & Flow</span>
+                    </div>
+
+                    <div class="bg-teal-50/60 border border-teal-100 rounded-2xl p-2.5 text-left space-y-1">
+                        <span class="text-[10px] font-extrabold text-teal-900 uppercase tracking-wider block">Estudios donde entrena:</span>
+                        <div id="profileStudiosList" class="flex flex-wrap gap-1"></div>
+                    </div>
+                </div>
+
+                <div class="soft-card p-4 space-y-3">
+                    <h4 class="text-xs font-bold">Estadísticas de Entrenamiento</h4>
+                    <div class="grid grid-cols-2 gap-2 text-center">
+                        <div class="bg-gray-50 p-3 rounded-2xl">
+                            <span class="text-xs text-gray-400 block">Horas en pole</span>
+                            <span class="text-lg font-extrabold text-purple-950">38.5 hrs</span>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-2xl">
+                            <span class="text-xs text-gray-400 block">Poses logradas</span>
+                            <span class="text-lg font-extrabold text-purple-950" id="profilePosesCountDisplay">3 Poses</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="soft-card p-4 space-y-3">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                        <h4 class="text-xs font-bold flex items-center gap-1.5">
+                            <i data-lucide="image" class="w-4 h-4 text-purple-600"></i> Mi Galería Personal
+                        </h4>
+                        <button onclick="openProfileMediaUploadModal()" class="bg-purple-950 text-white text-[10px] font-bold px-2.5 py-1 rounded-xl shadow-sm flex items-center gap-1">
+                            <i data-lucide="plus" class="w-3 h-3"></i> Subir
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-1 bg-gray-100 p-1 rounded-xl text-[11px] font-bold text-gray-500">
+                        <button onclick="switchProfileGalleryTab('practices')" id="profGalTab-practices" class="py-1.5 rounded-lg bg-white text-purple-950 shadow-sm">Prácticas</button>
+                        <button onclick="switchProfileGalleryTab('outfits')" id="profGalTab-outfits" class="py-1.5 rounded-lg">Outfits</button>
+                        <button onclick="switchProfileGalleryTab('tutorials')" id="profGalTab-tutorials" class="py-1.5 rounded-lg">Tutoriales</button>
+                    </div>
+
+                    <div id="profileGalleryGrid" class="grid grid-cols-2 gap-2.5 pt-1"></div>
+                </div>
+
+                <!-- Developer Suggestion Card -->
+                <div class="soft-card p-4 bg-purple-50/60 border border-purple-100 space-y-2">
+                    <div class="flex items-center gap-2 text-purple-950">
+                        <div class="w-7 h-7 rounded-lg bg-purple-200 flex items-center justify-center shrink-0">
+                            <i data-lucide="message-square-plus" class="w-4 h-4 text-purple-900"></i>
+                        </div>
+                        <h4 class="text-xs font-bold">Buzón de Sugerencias</h4>
+                    </div>
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        ¿Tienes ideas para mejorar la app, una nueva función en mente o encontraste algún error? Tus sugerencias van directo al desarrollador de PoleRise.
+                    </p>
+                    <button onclick="openSuggestionModal()" class="w-full bg-purple-100 hover:bg-purple-200 text-purple-950 font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition">
+                        <i data-lucide="send" class="w-3.5 h-3.5"></i> Enviar Sugerencia al Desarrollador
+                    </button>
+                </div>
+
+                <button onclick="logoutUser()" class="w-full bg-rose-50 text-rose-600 font-bold text-xs py-3.5 rounded-2xl hover:bg-rose-100 transition">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+
+        <!-- FLOATING BOTTOM NAVIGATION BAR -->
+        <div id="bottomNav" class="hidden absolute bottom-5 left-5 right-5 h-16 floating-nav rounded-full px-4 flex justify-around items-center z-40">
+            <button onclick="switchTab('home')" id="tab-home" class="nav-btn text-purple-300 scale-110 flex flex-col items-center justify-center transition cursor-pointer">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="text-[9px] font-bold mt-0.5">Inicio</span>
+            </button>
+
+            <button onclick="switchTab('glossary')" id="tab-glossary" class="nav-btn text-white/60 flex flex-col items-center justify-center transition cursor-pointer">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                <span class="text-[9px] font-bold mt-0.5">Glosario</span>
+            </button>
+
+            <button onclick="switchTab('community')" id="tab-community" class="nav-btn text-white/60 flex flex-col items-center justify-center transition cursor-pointer">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <span class="text-[9px] font-bold mt-0.5">Social</span>
+            </button>
+
+            <button onclick="switchTab('chat')" id="tab-chat" class="nav-btn text-white/60 flex flex-col items-center justify-center transition cursor-pointer">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+                <span class="text-[9px] font-bold mt-0.5">Chat</span>
+            </button>
+
+            <button onclick="switchTab('progress')" id="tab-progress" class="nav-btn text-white/60 flex flex-col items-center justify-center transition cursor-pointer">
+                <i data-lucide="list-checks" class="w-5 h-5"></i>
+                <span class="text-[9px] font-bold mt-0.5">Progreso</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- MODALS & OVERLAYS -->
+    <div id="fullscreenMediaModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-50 flex flex-col justify-between p-4 animate-slide-up">
+        <div class="flex justify-between items-center text-white pt-2">
+            <span id="fullscreenMediaCategory" class="text-xs font-bold uppercase tracking-wider text-purple-300">Práctica</span>
+            <button onclick="closeFullscreenMediaModal()" class="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="my-auto w-full max-h-[65vh] flex items-center justify-center overflow-hidden rounded-2xl">
+            <img id="fullscreenImg" src="" class="max-w-full max-h-[65vh] object-contain rounded-xl">
+        </div>
+
+        <div class="space-y-2.5 pb-4">
+            <h4 id="fullscreenTitle" class="text-white text-sm font-bold text-center">Título</h4>
+            <div class="flex gap-2">
+                <button id="fullscreenDownloadBtn" onclick="downloadActiveGalleryImage()" class="flex-1 bg-white/20 hover:bg-white/30 text-white font-bold py-3 rounded-2xl text-xs flex items-center justify-center gap-2 transition">
+                    <i data-lucide="download" class="w-4 h-4"></i> Descargar Imagen
+                </button>
+                <button id="fullscreenShareBtn" onclick="" class="flex-1 bg-pastel-violet text-purple-950 font-bold py-3 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg">
+                    <i data-lucide="share-2" class="w-4 h-4"></i> Compartir en Comunidad
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customRoutineModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-6 space-y-4 max-h-[85vh] overflow-y-auto no-scrollbar animate-slide-up">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 id="customRoutineModalTitle" class="text-base font-bold text-gray-900">Crear Rutina Personalizada</h3>
+                <button onclick="closeCustomRoutineModal()" class="text-gray-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <input type="hidden" id="editingRoutineId" value="">
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="font-bold text-gray-700 block mb-1">Nombre de la Rutina:</label>
+                    <input type="text" id="routineNameInput" placeholder="Ej. Combo Spin Avanzado & Flex" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+
+                <div class="flex items-center justify-between bg-purple-50 p-3 rounded-2xl border border-purple-100">
+                    <div>
+                        <span class="font-bold text-purple-950 block">Incluir Calentamiento Previo</span>
+                        <span class="text-[10px] text-gray-500">Secuencia de movilidad de 10 min</span>
+                    </div>
+                    <input type="checkbox" id="routineWarmupToggle" checked class="w-4 h-4 accent-purple-700">
+                </div>
+
+                <div>
+                    <label class="font-bold text-gray-700 block mb-1">Disciplinas a Trabajar:</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200 cursor-pointer">
+                            <input type="checkbox" name="routineTech" value="Pole Estático" checked class="accent-purple-700">
+                            <span class="font-semibold">Pole Estático</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200 cursor-pointer">
+                            <input type="checkbox" name="routineTech" value="Pole Giratorio (Spin)" checked class="accent-purple-700">
+                            <span class="font-semibold">Pole Spin</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200 cursor-pointer">
+                            <input type="checkbox" name="routineTech" value="Fuerza & Inversiones" class="accent-purple-700">
+                            <span class="font-semibold">Inversiones</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200 cursor-pointer">
+                            <input type="checkbox" name="routineTech" value="Flexibilidad" class="accent-purple-700">
+                            <span class="font-semibold">Flexibilidad</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="font-bold text-gray-700 block mb-1">Seleccionar Figuras a Práctica:</label>
+                    <div id="routinePosesSelectionList" class="space-y-1.5 max-h-36 overflow-y-auto no-scrollbar bg-gray-50 p-2 rounded-xl border border-gray-200"></div>
+                </div>
+            </div>
+
+            <button onclick="saveCustomRoutine()" class="w-full bg-pastel-violet text-purple-950 font-bold py-3 rounded-2xl text-xs shadow-md">
+                Guardar Rutina
+            </button>
+        </div>
+    </div>
+
+    <div id="onboardingModal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[360px] rounded-3xl p-6 space-y-4 shadow-2xl animate-slide-up text-center relative">
+            <button onclick="closeOnboardingModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="w-16 h-16 bg-purple-100 rounded-3xl text-purple-900 mx-auto flex items-center justify-center">
+                <i id="onboardingStepIcon" data-lucide="sparkles" class="w-8 h-8"></i>
+            </div>
+
+            <div>
+                <span id="onboardingStepBadge" class="bg-purple-100 text-purple-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Paso 1 de 4</span>
+                <h3 id="onboardingTitle" class="text-base font-bold text-gray-900 mt-2">Bienvenida a PoleRise ✨</h3>
+                <p id="onboardingBody" class="text-xs text-gray-500 leading-relaxed mt-2.5">
+                    Tu espacio personalizado para registrar tu progreso en el tubo, guardar logros y conectar con otras Pole Sisters.
+                </p>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="prevOnboardingStep()" id="onboardingPrevBtn" class="bg-gray-100 text-gray-600 font-bold py-2.5 px-4 rounded-xl text-xs hidden">Atrás</button>
+                <button onclick="nextOnboardingStep()" id="onboardingNextBtn" class="flex-1 bg-pastel-violet text-purple-950 font-bold py-2.5 rounded-xl text-xs shadow-md">Siguiente</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="directChatModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-5 space-y-3 max-h-[85vh] flex flex-col animate-slide-up">
+            <div class="flex justify-between items-center border-b pb-2">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="previewCurrentChatFriend()">
+                    <img id="chatTargetAvatar" src="" class="w-8 h-8 rounded-full object-cover">
+                    <div>
+                        <h4 id="chatTargetName" class="text-xs font-bold text-gray-900">Amiga</h4>
+                        <span class="text-[9px] text-emerald-600 font-bold">En línea • Ver Perfil</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="reportCurrentChat()" class="p-1 rounded-lg text-rose-500 hover:bg-rose-50" title="Reportar Chat">
+                        <i data-lucide="flag" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="deleteCurrentChatThread()" class="p-1 rounded-lg text-gray-400 hover:bg-rose-50 hover:text-rose-600" title="Eliminar Chat">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="closeDirectChatModal()" class="text-gray-400 hover:text-gray-600 p-1">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="directMessagesList" class="flex-1 overflow-y-auto space-y-2 no-scrollbar p-1"></div>
+
+            <div id="chatMediaPreviewBox" class="hidden relative w-full h-24 bg-gray-100 rounded-xl overflow-hidden border border-purple-100">
+                <img id="chatMediaPreviewImg" src="" class="w-full h-full object-cover">
+                <button onclick="clearChatMediaPreview()" class="absolute top-1 right-1 bg-black/60 text-white p-1 rounded-full">
+                    <i data-lucide="x" class="w-3 h-3"></i>
+                </button>
+            </div>
+
+            <div class="flex gap-2 pt-1 border-t border-gray-100 items-center">
+                <label class="bg-purple-100 text-purple-900 p-2 rounded-xl cursor-pointer hover:bg-purple-200 transition shrink-0" title="Adjuntar foto/video">
+                    <i data-lucide="image" class="w-4 h-4"></i>
+                    <input type="file" accept="image/*,video/*" class="hidden" onchange="handleChatMediaUpload(event)">
+                </label>
+                <input type="text" id="directMessageInput" placeholder="Escribe un mensaje privado..." class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none">
+                <button onclick="sendDirectMessage()" class="bg-purple-950 text-white font-bold px-3.5 py-2 rounded-xl text-xs shrink-0">
+                    Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="userProfilePreviewModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[340px] rounded-3xl p-5 space-y-4 shadow-2xl animate-slide-up text-center relative">
+            <button onclick="closeUserProfilePreviewModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="w-20 h-20 rounded-full bg-pastel-pink p-1 mx-auto relative shadow-sm">
+                <img id="previewModalAvatar" src="" class="w-full h-full object-cover rounded-full">
+            </div>
+
+            <div>
+                <h3 id="previewModalName" class="text-base font-bold text-gray-900">Nombre</h3>
+                <p id="previewModalHandle" class="text-xs text-gray-400 font-medium">@handle</p>
+                <span id="previewModalRole" class="inline-block bg-purple-100 text-purple-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full mt-1">Rol</span>
+            </div>
+
+            <p id="previewModalBio" class="text-xs text-gray-600 bg-gray-50 p-2.5 rounded-xl leading-relaxed">
+                Biografía del usuario
+            </p>
+
+            <div class="flex justify-center gap-2 text-[10px] font-bold">
+                <span id="previewModalLevel" class="bg-purple-50 text-purple-900 px-2.5 py-1 rounded-full">Nivel</span>
+                <span id="previewModalStyle" class="bg-pink-50 text-pink-900 px-2.5 py-1 rounded-full">Estilo</span>
+            </div>
+
+            <div id="previewModalActions" class="space-y-2 pt-2 border-t border-gray-100"></div>
+        </div>
+    </div>
+
+    <div id="addFriendModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[340px] rounded-3xl p-5 space-y-3 shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h4 class="text-xs font-bold text-gray-900">Buscar & Agregar Amiga</h4>
+                <button onclick="closeFriendSearchModal()" class="text-gray-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            
+            <input type="text" id="friendSearchInput" onkeyup="searchUsersToFriend()" placeholder="Buscar por @handle o nombre..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs">
+
+            <div id="searchResultsContainer" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar pt-1"></div>
+        </div>
+    </div>
+
+    <div id="suggestionModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-6 space-y-3 animate-slide-up">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                    <i data-lucide="message-square-plus" class="w-4 h-4 text-purple-700"></i> Sugerencia para el Desarrollador
+                </h3>
+                <button onclick="closeSuggestionModal()" class="text-gray-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <p class="text-xs text-gray-500 leading-relaxed">
+                ¿Tienes alguna idea para mejorar PoleRise o encontraste alguna falla? ¡Mándale un mensaje directo al desarrollador!
+            </p>
+            <textarea id="suggestionText" rows="4" placeholder="Escribe tus ideas, comentarios o mejoras..." class="w-full bg-gray-50 border border-gray-200 rounded-2xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-purple-200"></textarea>
+            <button onclick="submitSuggestion()" class="w-full bg-pastel-violet text-purple-950 font-bold py-3 rounded-2xl text-xs shadow-md">
+                Enviar Sugerencia
+            </button>
+        </div>
+    </div>
+
+    <div id="reportModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[340px] rounded-3xl p-5 space-y-3 shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h4 class="text-xs font-bold text-rose-600 flex items-center gap-1">
+                    <i data-lucide="flag" class="w-4 h-4"></i> Reportar Contenido o Usuario
+                </h4>
+                <button onclick="closeReportModal()" class="text-gray-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <p class="text-[11px] text-gray-500">Este reporte llegará directamente al panel de administración del desarrollador para su revisión urgente.</p>
+            
+            <input type="hidden" id="reportTargetType" value="">
+            <input type="hidden" id="reportTargetId" value="">
+
+            <select id="reportReasonSelect" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs">
+                <option value="Contenido inapropiado o explícito">Contenido inapropiado o explícito</option>
+                <option value="Comportamiento ofensivo o acoso">Comportamiento ofensivo o acoso</option>
+                <option value="Información falsa / Riesgo físico">Información falsa o de riesgo físico</option>
+                <option value="Spam o cuenta falsa">Spam o cuenta falsa</option>
+            </select>
+
+            <textarea id="reportNotesInput" rows="2" placeholder="Detalles adicionales opcionales..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-xs"></textarea>
+
+            <button onclick="submitReport()" class="w-full bg-rose-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">
+                Enviar Reporte a Administración
+            </button>
+        </div>
+    </div>
+
+    <div id="profileMediaModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-6 space-y-4 animate-slide-up">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-base font-bold">Agregar a Mi Galería</h3>
+                <button onclick="closeProfileMediaModal()" class="text-gray-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-gray-700 block mb-1">Categoría de la Foto/Video:</label>
+                    <select id="mediaCategorySelect" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs">
+                        <option value="practices">Prácticas & Avances en Pole</option>
+                        <option value="outfits">Outfits & Estilo</option>
+                        <option value="tutorials">Mis Tutoriales Paso a Paso</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-700 block mb-1">Título / Descripción breve:</label>
+                    <input type="text" id="mediaTitleInput" placeholder="Ej. Práctica de Spin o Mi outfit rosa favorito ✨" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-700 block mb-1.5">Seleccionar Archivo:</label>
+                    <div class="flex gap-2">
+                        <label class="flex-1 bg-gray-100 border border-gray-200 py-2 px-3 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer">
+                            <i data-lucide="image" class="w-4 h-4 text-purple-700"></i> Galería
+                            <input type="file" accept="image/*,video/*" class="hidden" onchange="handleImageUpload(event, 'profileMediaPreviewImg')">
+                        </label>
+                        <label class="flex-1 bg-gray-100 border border-gray-200 py-2 px-3 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer">
+                            <i data-lucide="camera" class="w-4 h-4 text-pink-700"></i> Cámara
+                            <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleImageUpload(event, 'profileMediaPreviewImg')">
+                        </label>
+                    </div>
+
+                    <div id="profileMediaPreviewContainer" class="hidden relative w-full h-36 bg-gray-100 rounded-2xl overflow-hidden mt-3">
+                        <img id="profileMediaPreviewImg" src="" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="saveProfileMediaItem()" class="w-full bg-pastel-violet text-purple-950 font-bold py-3 rounded-2xl text-xs shadow-md">
+                Guardar en Mi Galería
+            </button>
+        </div>
+    </div>
+
+    <!-- WORKOUT PLAYER MODAL -->
+    <div id="workoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex flex-col justify-between p-5">
+        <div class="flex justify-between items-center text-white pt-2">
+            <div>
+                <span id="playerStageBadge" class="text-[10px] font-bold tracking-wider text-purple-300 uppercase">Etapa: Calentamiento</span>
+                <h3 id="routineTitleDisplay" class="text-base font-bold">Hombros & Espalda</h3>
+            </div>
+            <button onclick="closeWorkoutModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div id="warmupPlayerCard" class="bg-white rounded-3xl p-6 text-center my-auto space-y-4 shadow-2xl animate-slide-up">
+            <span id="stepProgressBadge" class="inline-block bg-purple-100 text-purple-900 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+                Paso 1 de 4
+            </span>
+
+            <div class="w-20 h-20 bg-pastel-violet/30 rounded-full flex items-center justify-center mx-auto text-purple-900">
+                <i id="stepIcon" data-lucide="rotate-cw" class="w-10 h-10"></i>
+            </div>
+
+            <div>
+                <h4 id="stepName" class="text-lg font-extrabold text-gray-900">Movilidad de Muñecas</h4>
+                <p id="stepDescription" class="text-xs text-gray-500 mt-1 leading-relaxed">
+                    Círculos lentos con ambas muñecas y estiramiento con palmas hacia el suelo para preparar el agarre.
+                </p>
+            </div>
+
+            <div class="bg-gray-50 rounded-2xl p-4">
+                <span class="text-3xl font-black text-purple-950 tracking-tight font-mono" id="routineTimerDisplay">02:00</span>
+                <span class="text-[10px] text-gray-400 block mt-1">Tiempo de Ejercicio</span>
+            </div>
+
+            <div class="flex items-center justify-center gap-3 pt-2">
+                <button onclick="prevWorkoutStep()" class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-700">
+                    <i data-lucide="skip-back" class="w-5 h-5"></i>
+                </button>
+
+                <button onclick="toggleWorkoutTimer()" id="playPauseBtn" class="w-14 h-14 rounded-full bg-purple-950 flex items-center justify-center text-white shadow-lg">
+                    <i data-lucide="pause" class="w-6 h-6"></i>
+                </button>
+
+                <button onclick="nextWorkoutStep()" class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-700">
+                    <i data-lucide="skip-forward" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="polePracticePlayerCard" class="hidden bg-white rounded-3xl p-6 text-center my-auto space-y-4 shadow-2xl animate-slide-up">
+            <span class="inline-block bg-amber-100 text-amber-900 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+                🔥 En la Barra - Tiempo Continuo
+            </span>
+
+            <div class="space-y-2.5 text-left bg-purple-50/50 p-3 rounded-2xl border border-purple-100">
+                <div>
+                    <label class="text-[11px] font-bold text-gray-700 block mb-1">Tipo de Pole:</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="setPoleType('Estatico')" id="poleTypeStaticBtn" class="py-1.5 px-3 rounded-xl text-xs font-bold bg-purple-950 text-white shadow-sm">
+                            Pole Estático
+                        </button>
+                        <button onclick="setPoleType('Giratorio')" id="poleTypeSpinBtn" class="py-1.5 px-3 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200">
+                            Pole Giratorio (Spin)
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-bold text-gray-700 block mb-1">Figura / Movimiento que Entrenas:</label>
+                    <select id="activeMoveSelector" onchange="updateActivePoseDisplayCard()" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-purple-950">
+                    </select>
+                </div>
+
+                <div id="activePoseInfoCard" class="bg-white p-3 rounded-xl border border-purple-100 space-y-2">
+                    <div class="flex items-center gap-2.5">
+                        <img id="activePoseImg" src="" class="w-12 h-12 rounded-lg object-cover bg-gray-100 shrink-0">
+                        <div class="min-w-0">
+                            <span id="activePoseLevelTag" class="text-[9px] font-bold uppercase bg-purple-100 text-purple-900 px-2 py-0.5 rounded-full">Principiante</span>
+                            <h5 id="activePoseName" class="text-xs font-extrabold text-gray-900 truncate mt-0.5">Nombre</h5>
+                            <p id="activePoseGrips" class="text-[10px] text-purple-700 font-semibold truncate"></p>
+                        </div>
+                    </div>
+                    <p id="activePoseDesc" class="text-[10px] text-gray-500 leading-tight border-t border-gray-100 pt-1.5 max-h-12 overflow-y-auto no-scrollbar"></p>
+                </div>
+            </div>
+
+            <div class="bg-purple-950 text-white rounded-2xl p-5 shadow-inner">
+                <span class="text-4xl font-black tracking-wider font-mono text-amber-300" id="livePracticeStopwatch">00:00:00</span>
+                <span class="text-[10px] text-purple-200 block mt-1">Tiempo Transcurrido Practicando</span>
+            </div>
+
+            <div class="flex items-center justify-center gap-3">
+                <button onclick="togglePracticeStopwatch()" id="stopwatchPlayPauseBtn" class="w-14 h-14 rounded-full bg-purple-950 flex items-center justify-center text-white shadow-lg">
+                    <i data-lucide="pause" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <button onclick="finishWorkoutRoutine()" class="w-full bg-emerald-500 text-white font-bold py-3.5 rounded-2xl text-xs shadow-lg flex items-center justify-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Finalizar y Guardar Sesión
+        </button>
+    </div>
+
+    <!-- ANALYTICS MODAL -->
+    <div id="analyticsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto no-scrollbar animate-slide-up">
+            <div class="flex justify-between items-center border-b pb-3 sticky top-0 bg-white z-10">
+                <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4 text-purple-700"></i> Estadísticas Detalladas
+                </h3>
+                <button onclick="toggleDetailedAnalyticsModal()" class="text-gray-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <div class="soft-card p-4 space-y-2">
+                <h4 class="text-xs font-bold text-gray-800">Distribución por Tipo de Pole</h4>
+                <div class="w-full bg-gray-100 rounded-full h-4 flex overflow-hidden">
+                    <div class="bg-purple-900 h-full text-[9px] font-bold text-white flex items-center justify-center" style="width: 58%">58% Estático</div>
+                    <div class="bg-pink-400 h-full text-[9px] font-bold text-purple-950 flex items-center justify-center" style="width: 42%">42% Spin</div>
+                </div>
+            </div>
+
+            <div class="soft-card p-4 space-y-2">
+                <h4 class="text-xs font-bold text-gray-800">Enfoque de Entrenamiento</h4>
+                <div class="h-44 w-full">
+                    <canvas id="detailedCategoryChart"></canvas>
+                </div>
+            </div>
+
+            <div class="soft-card p-4 space-y-2">
+                <h4 class="text-xs font-bold text-gray-800">Nivel de Figuras Dominadas</h4>
+                <div class="space-y-1.5 text-xs font-medium">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Principiante</span>
+                        <span class="font-bold text-purple-950">5 Figuras (100%)</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Intermedio</span>
+                        <span class="font-bold text-purple-950">3 Figuras (60%)</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Avanzado</span>
+                        <span class="font-bold text-purple-950">1 Figura (20%)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE EDIT MODAL -->
+    <div id="profileEditModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-6 space-y-4 animate-slide-up max-h-[85vh] overflow-y-auto no-scrollbar">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-base font-bold text-gray-900">Editar Mi Perfil</h3>
+                <button onclick="closeProfileEditModal()" class="text-gray-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-gray-700 block mb-1.5">Foto de Perfil:</label>
+                    <div class="flex items-center gap-3 mb-2">
+                        <img id="editAvatarPreview" src="" class="w-14 h-14 rounded-full object-cover border border-purple-200">
+                        <div class="flex gap-2">
+                            <label class="bg-purple-100 text-purple-900 px-3 py-1.5 rounded-xl text-[11px] font-bold cursor-pointer flex items-center gap-1">
+                                <i data-lucide="image" class="w-3.5 h-3.5"></i> Galería
+                                <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'editAvatarPreview')">
+                            </label>
+                            <label class="bg-pink-100 text-pink-900 px-3 py-1.5 rounded-xl text-[11px] font-bold cursor-pointer flex items-center gap-1">
+                                <i data-lucide="camera" class="w-3.5 h-3.5"></i> Cámara
+                                <input type="file" accept="image/*" capture="user" class="hidden" onchange="handleImageUpload(event, 'editAvatarPreview')">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-700 block mb-1">Nombre Completo:</label>
+                    <input type="text" id="editNameInput" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-700 block mb-1">Rol / Tipo de Usuario:</label>
+                    <select id="editRoleInput" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold text-purple-950">
+                        <option value="Alumna / Practicante">Alumna / Practicante</option>
+                        <option value="Instructora / Maestra">Instructora / Maestra de Pole</option>
+                        <option value="Atleta Profesional">Atleta Profesional</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-700 block mb-1">Usuario (@handle):</label>
+                    <input type="text" id="editHandleInput" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-700 block mb-1">Biografía:</label>
+                    <textarea id="editBioInput" rows="2" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs font-bold text-gray-700 block mb-1">Nivel:</label>
+                        <select id="editLevelInput" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-2 py-2 text-xs">
+                            <option value="Principiante">Principiante</option>
+                            <option value="Intermedio">Intermedio</option>
+                            <option value="Avanzado">Avanzado</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-gray-700 block mb-1">Estilo Principal:</label>
+                        <select id="editStyleInput" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-2 py-2 text-xs">
+                            <option value="Spin & Flow">Spin & Flow</option>
+                            <option value="Estática & Fuerza">Estática & Fuerza</option>
+                            <option value="Pole Exotic">Pole Exotic</option>
+                            <option value="Flexibilidad">Flexibilidad</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-bold text-gray-700">Estudios / Academias donde entrena:</label>
+                        <button onclick="addStudioInputField()" class="text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-lg">+ Agregar Estudio</button>
+                    </div>
+                    <div id="editStudiosContainer" class="space-y-1.5"></div>
+                </div>
+            </div>
+
+            <button onclick="saveUserProfile()" class="w-full bg-pastel-violet text-purple-950 font-bold py-3 rounded-2xl text-xs shadow-md">
+                Guardar Cambios
+            </button>
+        </div>
+    </div>
+
+    <!-- SAVED POSTS MODAL -->
+    <div id="savedPostsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-5 space-y-4 max-h-[85vh] flex flex-col animate-slide-up">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <i data-lucide="bookmark" class="w-4 h-4 text-purple-700"></i> Publicaciones Guardadas
+                </h3>
+                <button onclick="closeSavedPostsModal()" class="text-gray-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <div id="savedPostsList" class="flex-1 overflow-y-auto space-y-3 no-scrollbar pr-1"></div>
+        </div>
+    </div>
+
+    <!-- POSE DETAIL MODAL -->
+    <div id="poseDetailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto animate-slide-up no-scrollbar">
+            <div class="flex justify-between items-center sticky top-0 bg-white pt-1 pb-2 z-10">
+                <span id="modalPoseLevelBadge" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-purple-100 text-purple-900">Principiante</span>
+                <button onclick="closePoseModal()" class="p-1 rounded-full text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="w-full bg-gray-100 rounded-2xl overflow-hidden relative shadow-inner flex flex-col items-center justify-center">
+                <div id="modalVisualMedia" class="w-full h-60 relative">
+                    <img id="modalPoseImage" src="" class="w-full h-full object-cover" alt="Pose Preview">
+                </div>
+            </div>
+
+            <div>
+                <h3 id="modalPoseTitle" class="text-xl font-extrabold text-gray-900">Gemini</h3>
+                <p id="modalPoseSynonyms" class="text-xs text-purple-700 font-semibold mt-0.5"></p>
+                <p id="modalPoseDesc" class="text-xs text-gray-500 mt-1 leading-relaxed">Enganche de pierna exterior en la barra.</p>
+            </div>
+
+            <div class="soft-card p-3.5 bg-purple-50/50 border border-purple-100 space-y-1.5">
+                <span class="text-[10px] font-extrabold text-purple-900 uppercase tracking-wider flex items-center gap-1">
+                    <i data-lucide="anchor" class="w-3.5 h-3.5 text-purple-600"></i> Puntos Clave de Agarre y Contacto
+                </span>
+                <p id="modalPoseGrips" class="text-xs font-semibold text-purple-950">Corva externa, axila opuesta y costado de cintura.</p>
+            </div>
+
+            <button id="modalAchieveBtn" onclick="toggleAchieveFromModal()" class="w-full bg-pastel-violet text-purple-950 font-bold py-3.5 rounded-2xl text-xs shadow-md flex items-center justify-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4"></i> Guardar en Mi Progreso
+            </button>
+        </div>
+    </div>
+
+    <!-- NEW POST MODAL -->
+    <div id="newPostModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-6 space-y-4 animate-slide-up">
+            <div class="flex justify-between items-center">
+                <h3 id="postModalTitle" class="text-base font-bold text-gray-900">Publicar en Comunidad</h3>
+                <button onclick="closeNewPostModal()" class="p-1 rounded-full text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <input type="hidden" id="editingPostId" value="">
+
+            <div>
+                <label class="text-xs font-bold text-gray-600 block mb-1">Sección de Destino:</label>
+                <select id="postCategorySelect" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs">
+                    <option value="social">Social (Avances, fotos y motivación)</option>
+                    <option value="ayuda">Pedir Ayuda (Tips / Consejos de técnica)</option>
+                    <option value="tutoriales">Tutoriales (Paso a paso / Combos)</option>
+                </select>
+            </div>
+
+            <textarea id="postContent" rows="3" placeholder="Escribe tu mensaje, tutorial o pregunta..." class="w-full bg-gray-50 border border-gray-200 rounded-2xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-purple-200"></textarea>
+
+            <div id="postPreviewContainer" class="hidden relative rounded-xl overflow-hidden h-32 bg-gray-100">
+                <img id="postPreviewImg" src="" class="w-full h-full object-cover">
+                <button onclick="clearPostPreview()" class="absolute top-1 right-1 bg-black/60 text-white p-1 rounded-full"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+            </div>
+
+            <div class="flex gap-2">
+                <label class="flex-1 bg-gray-100 border border-gray-200 py-2.5 px-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i data-lucide="image" class="w-4 h-4 text-purple-700"></i> Galería
+                    <input type="file" accept="image/*,video/*" class="hidden" onchange="handleImageUpload(event, 'postPreviewImg')">
+                </label>
+                <label class="flex-1 bg-gray-100 border border-gray-200 py-2.5 px-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i data-lucide="camera" class="w-4 h-4 text-pink-700"></i> Cámara
+                    <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleImageUpload(event, 'postPreviewImg')">
+                </label>
+            </div>
+
+            <button onclick="submitNewPost()" class="w-full bg-pastel-violet text-purple-950 font-bold py-3.5 rounded-2xl text-xs shadow-md">
+                Publicar en Comunidad
+            </button>
+        </div>
+    </div>
+
+    <!-- COMMENTS MODAL -->
+    <div id="commentsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-5 space-y-4 max-h-[85vh] flex flex-col animate-slide-up">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-4 h-4 text-purple-700"></i> Comentarios
+                </h3>
+                <button onclick="closeCommentsModal()" class="text-gray-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <div id="commentsList" class="flex-1 overflow-y-auto space-y-3 no-scrollbar pr-1"></div>
+
+            <div class="flex gap-2 pt-2 border-t border-gray-100">
+                <input type="text" id="newCommentInput" placeholder="Escribe un comentario o apoyo..." class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-purple-200">
+                <button onclick="submitComment()" class="bg-pastel-violet text-purple-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1">
+                    Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECRET PASSCODE MODAL -->
+    <div id="secretPasscodeModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[320px] rounded-3xl p-5 space-y-3 shadow-2xl text-center">
+            <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-950 mx-auto flex items-center justify-center">
+                <i data-lucide="lock" class="w-5 h-5"></i>
+            </div>
+            <h4 class="text-sm font-bold text-gray-900">Verificación de Administrador</h4>
+            <p class="text-[11px] text-gray-400">Ingresa la clave de acceso para continuar</p>
+            
+            <input type="password" id="secretPasscodeInput" autocomplete="off" placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-center text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-purple-300">
+            
+            <p id="secretPasscodeError" class="text-[11px] text-rose-500 font-semibold hidden">Clave de verificación incorrecta</p>
+
+            <div class="flex gap-2 pt-1">
+                <button onclick="submitSecretPasscode()" class="flex-1 bg-purple-950 text-white font-bold py-2 rounded-xl text-xs">Verificar</button>
+                <button onclick="closeSecretPasscodeModal()" class="bg-gray-100 text-gray-600 font-bold px-3 py-2 rounded-xl text-xs">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUPPORT / ADMIN MODAL -->
+    <div id="supportModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-end justify-center">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto no-scrollbar animate-slide-up">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <i data-lucide="shield" class="w-4 h-4 text-purple-700"></i> Panel de Administración y Soporte
+                </h3>
+                <button onclick="closeSupportModal()" class="text-gray-400"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <div id="supportDashboard" class="space-y-4">
+                <div class="grid grid-cols-4 gap-1 bg-gray-100 p-1 rounded-xl text-[10px] font-bold text-gray-600">
+                    <button onclick="switchAdminTab('reports')" id="adminTab-reports" class="py-1.5 rounded-lg bg-white text-gray-900 shadow-sm">Reportes</button>
+                    <button onclick="switchAdminTab('suggestions')" id="adminTab-suggestions" class="py-1.5 rounded-lg text-gray-500">Sugerencias</button>
+                    <button onclick="switchAdminTab('usersCms')" id="adminTab-usersCms" class="py-1.5 rounded-lg text-gray-500">Cuentas</button>
+                    <button onclick="switchAdminTab('glossaryCms')" id="adminTab-glossaryCms" class="py-1.5 rounded-lg text-gray-500">CMS Glosario</button>
+                </div>
+
+                <div id="adminPanel-reports" class="space-y-3">
+                    <h4 class="text-xs font-bold text-gray-800">Reportes de Usuarias y Publicaciones</h4>
+                    <div id="adminReportsList" class="space-y-2"></div>
+                </div>
+
+                <div id="adminPanel-suggestions" class="hidden space-y-3">
+                    <h4 class="text-xs font-bold text-gray-800">Mensajes y Sugerencias de Usuarias</h4>
+                    <div id="adminSuggestionsList" class="space-y-2"></div>
+                </div>
+
+                <div id="adminPanel-usersCms" class="hidden space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-xs font-bold text-gray-800">Cuentas Registradas & Modo Consulta</h4>
+                        <span class="text-[10px] text-gray-400 font-semibold">Acceso de Soporte</span>
+                    </div>
+
+                    <div id="adminUsersList" class="space-y-2 max-h-60 overflow-y-auto no-scrollbar"></div>
+                </div>
+
+                <div id="adminPanel-glossaryCms" class="hidden space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-xs font-bold text-gray-800">Editar/Agregar Poses en Tiempo Real</h4>
+                        <button onclick="openEditPoseForm(null)" class="bg-purple-950 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+                            <i data-lucide="plus" class="w-3 h-3"></i> Nueva Pose
+                        </button>
+                    </div>
+
+                    <div id="adminPoseList" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // Global Constants & State Variables
+        const SECRET_PASSCODE = "Lh11Sp44";
+        let logoTapCount = 0;
+        let logoTapTimer = null;
+        let originalAdminSession = null;
+        let currentActiveChatFriendId = null;
+        let activeCommentPostId = null;
+        let activeModalPoseId = null;
+        let activeFullscreenImageSrc = null;
+        let activeChatMedia = null;
+        let chartInstance = null;
+        let detailedChartInstance = null;
+
+        // Workout Timer / Player State Variables
+        let workoutTimerInterval = null;
+        let workoutTimeRemaining = 120;
+        let workoutIsPaused = false;
+        let currentWorkoutStage = "warmup"; // 'warmup' or 'pole'
+        let currentWorkoutStepIndex = 0;
+        let activePoleType = "Estatico";
+        let stopwatchInterval = null;
+        let stopwatchSeconds = 0;
+        let stopwatchIsRunning = false;
+
+        // Warmup exercises sequence
+        const warmupStepsSequence = [
+            { name: "Movilidad de Muñecas & Antebrazos", icon: "rotate-cw", desc: "Círculos suaves con ambas muñecas y estiramiento con palmas hacia el suelo.", duration: 120 },
+            { name: "Activación Escapular & Hombros", icon: "activity", desc: "Rotaciones de hombros hacia atrás y elevaciones de brazos activando dorsales.", duration: 180 },
+            { name: "Arqueos de Espalda & Gato-Camello", icon: "sun", desc: "Movilidad de columna en cuatro puntos alternando flexión y extensión suave.", duration: 180 },
+            { name: "Acondicionamiento de Corvas", icon: "flame", desc: "Aptitudes de flexión de rodilla presionando activamente contra el suelo.", duration: 120 }
+        ];
+
+        // User profile initial state
+        let userProfile = {
+            name: "Valeria Gomez",
+            handle: "@valeria.pole",
+            email: "valeria@polerise.app",
+            role: "Instructora / Maestra",
+            level: "Intermedio",
+            style: "Spin & Flow",
+            bio: "Apasionada del Spin Pole y flexibilidad. Entrenando para mi primera competencia 💜",
+            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+            studios: ["PoleStudio CDMX", "Elevation Pole Gym"],
+            savedPosts: []
+        };
+
+        // Registered user accounts database
+        let registeredUsers = [
+            { name: "Valeria Gomez", handle: "@valeria.pole", email: "valeria@polerise.app", role: "Instructora / Maestra", level: "Intermedio", style: "Spin & Flow", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80", bio: "Instructora de Pole Fitness y Flexibilidad ✨" },
+            { name: "Camila Torres", handle: "@cami.poleflow", email: "camila@polerise.app", role: "Alumna / Practicante", level: "Principiante", style: "Spin & Flow", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80", bio: "Aprendiendo mi primera inversión 💪" },
+            { name: "Sofia Mendoza", handle: "@sofi_exotic", email: "sofia@polerise.app", role: "Atleta Profesional", level: "Avanzado", style: "Pole Exotic", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80", bio: "Exotic Pole, Heels & Floorwork 👠" }
+        ];
+
+        // Friends database
+        let friendsList = [
+            { id: 101, name: "Camila Torres", handle: "@cami.poleflow", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80", status: "accepted" },
+            { id: 102, name: "Sofia Mendoza", handle: "@sofi_exotic", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80", status: "pending" }
+        ];
+
+        // Direct chat threads database
+        let directChatsData = {
+            101: [
+                { sender: "them", text: "¡Hola Valeria! ¿Listas para la clase de mañana?", time: "10:15 AM" },
+                { sender: "me", text: "¡Sí, Camila! Vamos a practicar la transición a Butterfly ✨", time: "10:18 AM" }
+            ]
+        };
+
+        // Personal media gallery
+        let profileMediaGallery = [
+            { id: 1, category: "practices", title: "Práctica de Spin", image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80" },
+            { id: 2, category: "outfits", title: "Outfit Rosa Pastel", image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80" },
+            { id: 3, category: "tutorials", title: "Entrada a Inversión", image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=400&auto=format&fit=crop&q=80" }
+        ];
+
+        // Glossary technical database
+        let glossaryData = [
+            { id: 1, name: "Gemini / Outside Leg Hang", difficulty: "Principiante", grips: "Corva externa, axila opuesta, cintura", desc: "Enganche de la pierna exterior en la barra con el torso erguido o extendido.", image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80", synonyms: "Outside Leg Hang", achieved: true },
+            { id: 2, name: "Scorpio / Inside Leg Hang", difficulty: "Principiante", grips: "Corva interna, muslo opuesto, cadera", desc: "Enganche de la pierna interna sobre la barra mientras la pierna externa se extiende.", image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80", synonyms: "Inside Leg Hang", achieved: true },
+            { id: 3, name: "Butterfly", difficulty: "Intermedio", grips: "Agarre empujado (Push Grip), tobillo externo", desc: "Inversión sobre las manos donde el cuerpo se aleja de la barra apoyando un pie.", image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=400&auto=format&fit=crop&q=80", synonyms: "Mariposa", achieved: true },
+            { id: 4, name: "Jade Split", difficulty: "Avanzado", grips: "Cintura posterior, mano sobre muslo, corva", desc: "Split horizontal sosteniendo la barra únicamente con el costado de la cintura y la mano posterior.", image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80", synonyms: "Jade", achieved: false }
+        ];
+
+        // Community social feed posts
+        let communityPosts = [
+            {
+                id: 1,
+                author: "Camila Torres",
+                handle: "@cami.poleflow",
+                avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
+                category: "social",
+                text: "¡Logré sostener mi Butterfly por 5 segundos seguidos! 🎉 Gracias a mi instructora por corregir la posición de las manos.",
+                image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&auto=format&fit=crop&q=80",
+                likes: 12,
+                comments: [
+                    { author: "Valeria Gomez", text: "¡Increíble avance Cami! Sigue empujando fuerte esa mano inferior 💜", time: "Hace 1 hora" }
+                ]
+            },
+            {
+                id: 2,
+                author: "Sofia Mendoza",
+                handle: "@sofi_exotic",
+                avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80",
+                category: "tutoriales",
+                text: "Tip rápido para suavizar los giros en Pole Spin: Mantén la mirada fija en un punto y activa el abdomen antes de extender las piernas.",
+                image: null,
+                likes: 24,
+                comments: []
+            }
+        ];
+
+        // Custom routines list
+        let customRoutinesData = [
+            { id: 1, name: "Rutina Flexibilidad & Spin", techs: ["Pole Spin", "Flexibilidad"], warmup: true, poses: [1, 3] },
+            { id: 2, name: "Combo Inversiones & Fuerza", techs: ["Pole Estático", "Inversiones"], warmup: true, poses: [2, 4] }
+        ];
+
+        // 25+ Daily Tips Database
+        const dailyTipsDatabase = [
+            { title: "Mejora tu Grip sin dañar tu piel", body: "Limpia la barra con alcohol isopropílico antes de entrenar y aplica magnesio líquido solo en tus manos y corvas. Mantener la piel hidratada por las noches evitará moretones profundos." },
+            { title: "Sostén de Hombros en Inversiones", body: "En cada inversión, empuja activamente el suelo o la barra alejando los hombros de tus orejas. Esto previene pinzamientos articulares y aumenta tu fuerza." },
+            { title: "Cuidado de la piel después de entrenar", body: "Aplica crema hidratante con árnica o aloe vera en las zonas de fricción justo después de ducharte para acelerar la recuperación cutánea." },
+            { title: "Agarre Correcto en Pole Spin", body: "En el pole giratorio, la velocidad la controlas tú: mientras más cerca estés de la barra más rápido giras; al extender extremidades, desaceleras." },
+            { title: "Calentamiento de Muñecas Esencial", body: "Dedica siempre al menos 3 minutos a rotaciones de muñecas y estiramientos en cuadripedia antes de subir a la barra." },
+            { title: "Acondicionamiento de Corvas", body: "Practica apretar un bloque de yoga detrás de tu rodilla en el suelo para fortalecer el agarre de corva antes de levantarte en la barra." },
+            { title: "Apertura de Espalda Segura", body: "Al hacer arcos o backbends, distribuye la flexión entre la zona torácica y los hombros, evitando colapsar únicamente la zona lumbar." },
+            { title: "Moretones o 'Pole Kisses'", body: "Los moretones son normales al adaptar la piel. Aplica compresas frías en las primeras 24 horas para reducir la inflamación." },
+            { title: "Enganche Seguro en Outside Leg Hang", body: "Asegúrate de enganchar bien profundo en la corva y inclinar ligeramente la cadera hacia arriba antes de soltar las manos." },
+            { title: "Manejo del Mareo en Pole Giratorio", body: "Si sientes mareo en pole spin, enfoca tu mirada fija en la barra y realiza pausas caminando despacio y tomando agua." },
+            { title: "Uso correcto del Magnesio", body: "No abuses del magnesio seco; si tus manos están muy secas, la barra resbalará más. El balance entre hidratación y magnesio es la clave." },
+            { title: "Fuerza en Abdomen Bajo", body: "Para subir las piernas a una inversión fluida, piensa en llevar las rodillas a tu pecho usando la fuerza abdominal sin dar impulso violento." },
+            { title: "Inversiones desde el Suelo", body: "Perfecciona primero tus elevaciones de cadera a vela en el suelo antes de intentar invertir con el peso corporal en el aire." },
+            { title: "Puntos de Contacto en Jade Split", body: "Mantén la barra encajada firmemente en el costado de tu cintura y presiona el muslo contra la barra para asegurar la fricción." },
+            { title: "Flexibilidad de Cadera Activa", body: "Entrena tus splits con contracción muscular activa en lugar de solo estiramiento pasivo para sostener posiciones en la barra." },
+            { title: "Respiración durante la Práctica", body: "Nunca aguantemos la respiración en posturas intensas. Exhala durante la fase de mayor esfuerzo o fuerza." },
+            { title: "Limpieza e Higiene de la Barra", body: "Pasa una toalla de microfibra con alcohol entre cada cambio de figura para eliminar la acumulación de sudor y magnesio." },
+            { title: "Protección de Tobillos y Empeines", body: "Asegúrate de usar calcetines o protectores durante las prácticas continuas de floorwork para evitar rozaduras." },
+            { title: "Ropa Adecuada para Pole", body: "Usa tops y shorts cortos que dejen expuestos los costados de la cintura, brazos y muslos para maximizar el agarre directo con la piel." },
+            { title: "Fortalecimiento de Escápulas", body: "Realiza retracciones escapulares colgada de la barra en agarre neutral para acondicionar tus dorsales." },
+            { title: "Manejo del Sudor Excesivo", body: "Si tus manos sudan demasiado, usa un antitranspirante especial para manos por las noches antes de tus días de entrenamiento." },
+            { title: "Floorwork Fluido y Sin Golpes", body: "En el trabajo de piso, transiciona rodando sobre partes carnosas del cuerpo y nunca apoyando directamente sobre los huesos de las rodillas." },
+            { title: "Calentamiento de Cuello", body: "No olvides realizar suaves inclinaciones y rotaciones de cuello antes de realizar figuras invertidas donde la cabeza cuelga." },
+            { title: "Sostenimiento en Mano Inferior (Push Grip)", body: "En la mariposa (Butterfly), mantén el codo inferior ligeramente doblado para proteger la articulación del brazo de apoyo." },
+            { title: "Descanso y Recuperación", body: "Tómate al menos 1 o 2 días de descanso total a la semana. El tejido muscular se repara y fortalece durante el reposo." }
+        ];
+
+        // Reports array
+        let adminReports = [];
+        let adminSuggestions = [];
+
+        // Initialization Logic
+        window.onload = function() {
+            lucide.createIcons();
+            renderGlossary(glossaryData);
+            renderUnlockedGallery();
+            renderCustomRoutinesList();
+            renderAcceptedFriendsList();
+            renderPendingFriendsList();
+            renderChatsList();
+            renderProfileGalleryGrid('practices');
+            updateProfileUI();
+            rotateDailyTip();
+        };
+
+        // AUTHENTICATION LOGIC
+        function loginUser(userName) {
+            userProfile.name = userName || "Valeria Gomez";
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('bottomNav').classList.remove('hidden');
+            document.getElementById('welcomeUser').innerText = `Hola, ${userProfile.name.split(' ')[0]} ✨`;
+            switchTab('home');
+        }
+
+        function handleEmailLogin(event) {
+            if (event) event.preventDefault();
+            const emailInput = document.getElementById('emailInput').value;
+            const name = emailInput ? emailInput.split('@')[0] : "Valeria";
+            loginUser(name);
+            return false;
+        }
+
+        function toggleRegisterView(showRegister) {
+            document.getElementById('loginCard').classList.toggle('hidden', showRegister);
+            document.getElementById('registerCard').classList.toggle('hidden', !showRegister);
+        }
+
+        function validateHandleUniqueness(input) {
+            let val = input.value.trim().toLowerCase();
+            if (!val.startsWith('@')) val = '@' + val;
+            const exists = registeredUsers.some(u => u.handle.toLowerCase() === val);
+            const errorMsg = document.getElementById('handleErrorMsg');
+            const submitBtn = document.getElementById('regSubmitBtn');
+
+            if (exists) {
+                errorMsg.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50');
+            } else {
+                errorMsg.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50');
+            }
+        }
+
+        function handleUserRegistration(event) {
+            if (event) event.preventDefault();
+            const name = document.getElementById('regNameInput').value;
+            const handle = document.getElementById('regHandleInput').value;
+            const email = document.getElementById('regEmailInput').value;
+            const role = document.getElementById('regRoleInput').value;
+
+            userProfile.name = name;
+            userProfile.handle = handle.startsWith('@') ? handle : '@' + handle;
+            userProfile.role = role;
+
+            registeredUsers.push({
+                name: name,
+                handle: userProfile.handle,
+                email: email,
+                role: role,
+                level: "Principiante",
+                style: "Spin & Flow",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+                bio: "Entrenando Pole Dance con PoleRise ✨"
+            });
+
+            updateProfileUI();
+            loginUser(name);
+            openOnboardingModal();
+            return false;
+        }
+
+        function logoutUser() {
+            document.getElementById('homeView').classList.add('hidden');
+            document.getElementById('glossaryView').classList.add('hidden');
+            document.getElementById('communityView').classList.add('hidden');
+            document.getElementById('chatView').classList.add('hidden');
+            document.getElementById('progressView').classList.add('hidden');
+            document.getElementById('profileView').classList.add('hidden');
+            document.getElementById('bottomNav').classList.add('hidden');
+            document.getElementById('authView').classList.remove('hidden');
+            if (originalAdminSession) exitImpersonation();
+        }
+
+        function switchTab(tabName) {
+            const views = ['homeView', 'glossaryView', 'communityView', 'chatView', 'progressView', 'profileView'];
+            views.forEach(v => {
+                const el = document.getElementById(v);
+                if (el) el.classList.add('hidden');
+            });
+
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => {
+                btn.classList.remove('text-purple-300', 'scale-110');
+                btn.classList.add('text-white/60');
+            });
+
+            const activeView = document.getElementById(tabName + 'View');
+            if (activeView) activeView.classList.remove('hidden');
+
+            const activeBtn = document.getElementById('tab-' + tabName);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-white/60');
+                activeBtn.classList.add('text-purple-300', 'scale-110');
+            }
+
+            if (tabName === 'community') switchCommunityTab('social');
+            if (tabName === 'progress') switchProgressSubTab('routines');
+            lucide.createIcons();
+        }
+
+        function rotateDailyTip() {
+            const randomIndex = Math.floor(Math.random() * dailyTipsDatabase.length);
+            const tip = dailyTipsDatabase[randomIndex];
+            document.getElementById('dailyTipTitle').innerText = tip.title;
+            document.getElementById('dailyTipBody').innerText = tip.body;
+        }
+
+        // PROFILE PREVIEW MODAL LOGIC
+        function openUserProfilePreview(handle) {
+            if (!handle) return;
+            const targetHandle = handle.toLowerCase();
+            
+            let user = registeredUsers.find(u => u.handle.toLowerCase() === targetHandle);
+            
+            if (!user && userProfile.handle.toLowerCase() === targetHandle) {
+                user = {
+                    name: userProfile.name,
+                    handle: userProfile.handle,
+                    avatar: userProfile.avatar,
+                    role: userProfile.role,
+                    level: userProfile.level,
+                    style: userProfile.style,
+                    bio: userProfile.bio
+                };
+            }
+
+            if (!user) {
+                user = {
+                    name: handle.replace('@', ''),
+                    handle: handle,
+                    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+                    role: "Practicante",
+                    level: "Intermedio",
+                    style: "Spin & Flow",
+                    bio: "Apasionada del pole dance y fitness ✨"
+                };
+            }
+
+            document.getElementById('previewModalAvatar').src = user.avatar;
+            document.getElementById('previewModalName').innerText = user.name;
+            document.getElementById('previewModalHandle').innerText = user.handle;
+            document.getElementById('previewModalRole').innerText = user.role || "Practicante";
+            document.getElementById('previewModalBio').innerText = user.bio || "Sin biografía disponible.";
+            document.getElementById('previewModalLevel').innerText = "Nivel: " + (user.level || "Principiante");
+            document.getElementById('previewModalStyle').innerText = "Estilo: " + (user.style || "Spin & Flow");
+
+            const actionsContainer = document.getElementById('previewModalActions');
+            actionsContainer.innerHTML = '';
+
+            const isMe = userProfile.handle.toLowerCase() === targetHandle;
+            if (isMe) {
+                actionsContainer.innerHTML = `<p class="text-xs text-purple-900 font-bold">¡Este es tu propio perfil! ✨</p>`;
+            } else {
+                const friend = friendsList.find(f => f.handle.toLowerCase() === targetHandle);
+                
+                if (friend && friend.status === 'accepted') {
+                    actionsContainer.innerHTML = `
+                        <div class="flex gap-2">
+                            <button onclick="closeUserProfilePreviewModal(); openDirectChatModal(${friend.id})" class="flex-1 bg-purple-950 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> Mandar Mensaje
+                            </button>
+                            <button onclick="closeUserProfilePreviewModal(); openReportModal('user', '${user.handle}')" class="bg-rose-50 text-rose-600 font-bold px-3 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
+                                <i data-lucide="flag" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    `;
+                } else if (friend && friend.status === 'pending') {
+                    actionsContainer.innerHTML = `
+                        <div class="flex gap-2">
+                            <button onclick="acceptFriendRequest(${friend.id}); closeUserProfilePreviewModal()" class="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs">
+                                Aceptar Solicitud
+                            </button>
+                            <button onclick="rejectFriendRequest(${friend.id}); closeUserProfilePreviewModal()" class="bg-gray-200 text-gray-700 font-bold px-3 py-2.5 rounded-xl text-xs">
+                                Rechazar
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actionsContainer.innerHTML = `
+                        <div class="flex gap-2">
+                            <button onclick="sendFriendRequestFromPreview('${user.name}', '${user.handle}', '${user.avatar}'); closeUserProfilePreviewModal()" class="flex-1 bg-pastel-violet text-purple-950 font-bold py-2.5 rounded-xl text-xs shadow-sm flex items-center justify-center gap-1">
+                                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Agregar Amiga
+                            </button>
+                            <button onclick="closeUserProfilePreviewModal(); openReportModal('user', '${user.handle}')" class="bg-rose-50 text-rose-600 font-bold px-3 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1" title="Reportar">
+                                <i data-lucide="flag" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            document.getElementById('userProfilePreviewModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeUserProfilePreviewModal() {
+            document.getElementById('userProfilePreviewModal').classList.add('hidden');
+        }
+
+        function sendFriendRequestFromPreview(name, handle, avatar) {
+            const exists = friendsList.find(f => f.handle.toLowerCase() === handle.toLowerCase());
+            if (!exists) {
+                friendsList.push({
+                    id: Date.now(),
+                    name: name,
+                    handle: handle,
+                    avatar: avatar,
+                    status: 'pending'
+                });
+                renderPendingFriendsList();
+                alert(`Solicitud de amistad enviada a ${handle} ✨`);
+            } else {
+                alert(`Ya tienes una relación o solicitud pendiente con ${handle}`);
+            }
+        }
+
+        // FRIEND & CHAT RENDERERS
+        function renderAcceptedFriendsList() {
+            const container = document.getElementById('acceptedFriendsList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const accepted = friendsList.filter(f => f.status === 'accepted');
+
+            if (accepted.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">No tienes amigas agregadas aún.</p>';
+                return;
+            }
+
+            accepted.forEach(friend => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-xs";
+                item.innerHTML = `
+                    <div class="flex items-center gap-2 cursor-pointer" onclick="openUserProfilePreview('${friend.handle}')">
+                        <img src="${friend.avatar}" class="w-8 h-8 rounded-full object-cover">
+                        <div>
+                            <p class="font-bold text-gray-900">${friend.name}</p>
+                            <p class="text-[10px] text-gray-400">${friend.handle}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="openDirectChatModal(${friend.id})" class="bg-purple-950 text-white p-1.5 rounded-lg text-[10px]" title="Enviar mensaje">
+                            <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="removeFriend(${friend.id})" class="text-rose-500 hover:bg-rose-50 p-1.5 rounded-lg" title="Eliminar amiga">
+                            <i data-lucide="user-minus" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        function renderPendingFriendsList() {
+            const container = document.getElementById('pendingFriendsList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const pending = friendsList.filter(f => f.status === 'pending');
+
+            if (pending.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">No tienes solicitudes pendientes.</p>';
+                return;
+            }
+
+            pending.forEach(friend => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-xs";
+                item.innerHTML = `
+                    <div class="flex items-center gap-2 cursor-pointer" onclick="openUserProfilePreview('${friend.handle}')">
+                        <img src="${friend.avatar}" class="w-8 h-8 rounded-full object-cover">
+                        <div>
+                            <p class="font-bold text-gray-900">${friend.name}</p>
+                            <p class="text-[10px] text-gray-400">${friend.handle}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="acceptFriendRequest(${friend.id})" class="bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-lg text-[10px]">
+                            Aceptar
+                        </button>
+                        <button onclick="rejectFriendRequest(${friend.id})" class="bg-gray-200 text-gray-700 font-bold px-2.5 py-1 rounded-lg text-[10px]">
+                            Rechazar
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        function acceptFriendRequest(id) {
+            const target = friendsList.find(f => f.id === id);
+            if (target) target.status = 'accepted';
+            renderAcceptedFriendsList();
+            renderPendingFriendsList();
+            renderChatsList();
+        }
+
+        function rejectFriendRequest(id) {
+            friendsList = friendsList.filter(f => f.id !== id);
+            renderPendingFriendsList();
+        }
+
+        function removeFriend(id) {
+            friendsList = friendsList.filter(f => f.id !== id);
+            renderAcceptedFriendsList();
+            renderChatsList();
+        }
+
+        function searchUsersToFriend() {
+            const container = document.getElementById('searchResultsContainer');
+            if (!container) return;
+
+            const query = document.getElementById('friendSearchInput').value.trim().toLowerCase();
+            container.innerHTML = '';
+
+            if (!query) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center py-3">Escribe un nombre o @handle para buscar.</p>';
+                return;
+            }
+
+            const matches = registeredUsers.filter(u => 
+                u.handle.toLowerCase() !== userProfile.handle.toLowerCase() &&
+                (u.name.toLowerCase().includes(query) || u.handle.toLowerCase().includes(query))
+            );
+
+            if (matches.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center py-3">No se encontraron usuarias con ese nombre.</p>';
+                return;
+            }
+
+            matches.forEach(user => {
+                const isFriend = friendsList.find(f => f.handle.toLowerCase() === user.handle.toLowerCase());
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-xs";
+                item.innerHTML = `
+                    <div class="flex items-center gap-2 cursor-pointer" onclick="openUserProfilePreview('${user.handle}')">
+                        <img src="${user.avatar}" class="w-8 h-8 rounded-full object-cover">
+                        <div>
+                            <p class="font-bold text-gray-900">${user.name}</p>
+                            <p class="text-[10px] text-gray-400">${user.handle}</p>
+                        </div>
+                    </div>
+                    <div>
+                        ${isFriend ? `
+                            <span class="text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-1 rounded-lg">
+                                ${isFriend.status === 'accepted' ? 'Amigas' : 'Pendiente'}
+                            </span>
+                        ` : `
+                            <button onclick="sendFriendRequestFromPreview('${user.name}', '${user.handle}', '${user.avatar}')" class="bg-pastel-violet text-purple-950 font-bold px-2.5 py-1 rounded-lg text-[10px] shadow-sm flex items-center gap-1">
+                                <i data-lucide="user-plus" class="w-3 h-3"></i> Agregar
+                            </button>
+                        `}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        function renderChatsList() {
+            const container = document.getElementById('chatsListContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const accepted = friendsList.filter(f => f.status === 'accepted');
+
+            if (accepted.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">No tienes chats activos. ¡Agrega amigas para conversar!</p>';
+                return;
+            }
+
+            accepted.forEach(friend => {
+                const messages = directChatsData[friend.id] || [];
+                const lastMsg = messages.length > 0 ? messages[messages.length - 1].text : "Inicia la conversación...";
+
+                const item = document.createElement('div');
+                item.className = "soft-card p-3 flex items-center justify-between cursor-pointer hover:bg-purple-50/50 transition";
+                item.onclick = () => openDirectChatModal(friend.id);
+                item.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <img src="${friend.avatar}" class="w-10 h-10 rounded-full object-cover">
+                        <div class="min-w-0">
+                            <h4 class="text-xs font-bold text-gray-900">${friend.name}</h4>
+                            <p class="text-[11px] text-gray-500 truncate">${lastMsg}</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-purple-600 font-bold bg-purple-50 px-2 py-1 rounded-full shrink-0">Chat</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function openDirectChatModal(friendId) {
+            currentActiveChatFriendId = friendId;
+            const friend = friendsList.find(f => f.id === friendId);
+            if (!friend) return;
+
+            document.getElementById('chatTargetAvatar').src = friend.avatar;
+            document.getElementById('chatTargetName').innerText = friend.name;
+
+            renderDirectMessagesList();
+            document.getElementById('directChatModal').classList.remove('hidden');
+        }
+
+        function closeDirectChatModal() {
+            document.getElementById('directChatModal').classList.add('hidden');
+            clearChatMediaPreview();
+        }
+
+        function renderDirectMessagesList() {
+            const container = document.getElementById('directMessagesList');
+            if (!container || !currentActiveChatFriendId) return;
+
+            const messages = directChatsData[currentActiveChatFriendId] || [];
+            container.innerHTML = '';
+
+            messages.forEach(msg => {
+                const isMe = msg.sender === 'me';
+                const bubble = document.createElement('div');
+                bubble.className = `flex ${isMe ? 'justify-end' : 'justify-start'} mb-2`;
+
+                let mediaHtml = msg.media ? `<img src="${msg.media}" class="w-48 h-32 object-cover rounded-xl mb-1 border border-purple-200">` : '';
+
+                bubble.innerHTML = `
+                    <div class="max-w-[80%] ${isMe ? 'bg-purple-950 text-white rounded-2xl rounded-tr-none' : 'bg-gray-100 text-gray-800 rounded-2xl rounded-tl-none'} p-3 text-xs shadow-sm">
+                        ${mediaHtml}
+                        ${msg.text ? `<p class="leading-relaxed">${msg.text}</p>` : ''}
+                        <span class="text-[9px] ${isMe ? 'text-purple-300' : 'text-gray-400'} block text-right mt-1">${msg.time}</span>
+                    </div>
+                `;
+                container.appendChild(bubble);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleChatMediaUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                activeChatMedia = e.target.result;
+                document.getElementById('chatMediaPreviewImg').src = activeChatMedia;
+                document.getElementById('chatMediaPreviewBox').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearChatMediaPreview() {
+            activeChatMedia = null;
+            const box = document.getElementById('chatMediaPreviewBox');
+            if (box) box.classList.add('hidden');
+        }
+
+        function sendDirectMessage() {
+            const input = document.getElementById('directMessageInput');
+            const text = input.value.trim();
+
+            if (!text && !activeChatMedia) return;
+
+            if (!directChatsData[currentActiveChatFriendId]) {
+                directChatsData[currentActiveChatFriendId] = [];
+            }
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            directChatsData[currentActiveChatFriendId].push({
+                sender: 'me',
+                text: text,
+                media: activeChatMedia,
+                time: timeStr
+            });
+
+            input.value = '';
+            clearChatMediaPreview();
+            renderDirectMessagesList();
+            renderChatsList();
+        }
+
+        function deleteCurrentChatThread() {
+            const friend = friendsList.find(f => f.id === currentActiveChatFriendId);
+            const friendName = friend ? friend.name : 'esta amiga';
+            
+            // Reemplazo del confirm tradicional por un diálogo modal personalizado integrado en la app
+            const confirmModal = document.createElement('div');
+            confirmModal.id = 'deleteChatConfirmModal';
+            confirmModal.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-slide-up';
+            confirmModal.innerHTML = `
+                <div class="bg-white w-full max-w-[320px] rounded-3xl p-5 space-y-3 shadow-2xl text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 mx-auto flex items-center justify-center">
+                        <i data-lucide="trash-2" class="w-6 h-6"></i>
+                    </div>
+                    <h4 class="text-sm font-bold text-gray-900">¿Eliminar conversación?</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed">
+                        Se borrará permanentemente todo el historial de mensajes con <span class="font-bold text-gray-800">${friendName}</span>. Esta acción no se puede deshacer.
+                    </p>
+                    <div class="flex gap-2 pt-2">
+                        <button id="cancelDeleteChatBtn" class="flex-1 bg-gray-100 text-gray-700 font-bold py-2.5 rounded-xl text-xs hover:bg-gray-200 transition">
+                            Cancelar
+                        </button>
+                        <button id="confirmDeleteChatBtn" class="flex-1 bg-rose-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md hover:bg-rose-700 transition">
+                            Sí, eliminar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(confirmModal);
+            lucide.createIcons();
+
+            document.getElementById('cancelDeleteChatBtn').onclick = () => {
+                confirmModal.remove();
+            };
+
+            document.getElementById('confirmDeleteChatBtn').onclick = () => {
+                // Borrado permanente de la conversación
+                delete directChatsData[currentActiveChatFriendId];
+                confirmModal.remove();
+                closeDirectChatModal();
+                renderChatsList();
+            };
+        }
+
+        function reportCurrentChat() {
+            openReportModal('chat', currentActiveChatFriendId);
+        }
+
+        function previewCurrentChatFriend() {
+            const friend = friendsList.find(f => f.id === currentActiveChatFriendId);
+            if (friend) openUserProfilePreview(friend.handle);
+        }
+
+        function openFriendSearchModal() {
+            document.getElementById('addFriendModal').classList.remove('hidden');
+        }
+
+        function closeFriendSearchModal() {
+            document.getElementById('addFriendModal').classList.add('hidden');
+        }
+
+        function switchChatSubTab(subTab) {
+            document.getElementById('chatSubView-chats').classList.toggle('hidden', subTab !== 'chats');
+            document.getElementById('chatSubView-friends').classList.toggle('hidden', subTab !== 'friends');
+
+            const btnChats = document.getElementById('chatSubTab-chats');
+            const btnFriends = document.getElementById('chatSubTab-friends');
+
+            if (subTab === 'chats') {
+                btnChats.className = "py-2 rounded-xl text-purple-950 bg-white shadow-sm font-extrabold";
+                btnFriends.className = "py-2 rounded-xl text-gray-500 font-bold";
+            } else {
+                btnFriends.className = "py-2 rounded-xl text-purple-950 bg-white shadow-sm font-extrabold";
+                btnChats.className = "py-2 rounded-xl text-gray-500 font-bold";
+            }
+        }
+
+        // GLOSSARY & POSES
+        function renderGlossary(data) {
+            const list = document.getElementById('glossaryList');
+            if (!list) return;
+            list.innerHTML = '';
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "soft-card p-3.5 flex items-center justify-between cursor-pointer hover:border-purple-200 border border-transparent transition";
+                card.onclick = () => openPoseModal(item.id);
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <img src="${item.image}" class="w-14 h-14 rounded-2xl object-cover shrink-0 bg-gray-100 shadow-sm">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-100 text-purple-900">${item.difficulty}</span>
+                                ${item.achieved ? '<span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><i data-lucide="check" class="w-2.5 h-2.5"></i> Lograda</span>' : ''}
+                            </div>
+                            <h4 class="text-xs font-bold text-gray-900 truncate mt-1">${item.name}</h4>
+                            <p class="text-[10px] text-gray-400 truncate">${item.grips}</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300 shrink-0"></i>
+                `;
+                list.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function filterGlossary() {
+            const query = document.getElementById('searchGlossary').value.toLowerCase();
+            const filtered = glossaryData.filter(g => 
+                g.name.toLowerCase().includes(query) || 
+                g.grips.toLowerCase().includes(query) ||
+                g.desc.toLowerCase().includes(query)
+            );
+            renderGlossary(filtered);
+        }
+
+        function setGlossaryFilter(diff) {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('bg-purple-950', 'text-white');
+                b.classList.add('bg-white', 'text-gray-600');
+            });
+            event.target.classList.remove('bg-white', 'text-gray-600');
+            event.target.classList.add('bg-purple-950', 'text-white');
+
+            if (diff === 'all') {
+                renderGlossary(glossaryData);
+            } else {
+                const filtered = glossaryData.filter(g => g.difficulty.toLowerCase() === diff);
+                renderGlossary(filtered);
+            }
+        }
+
+        function openPoseModal(poseId) {
+            activeModalPoseId = poseId;
+            const pose = glossaryData.find(p => p.id === poseId);
+            if (!pose) return;
+
+            document.getElementById('modalPoseLevelBadge').innerText = pose.difficulty;
+            document.getElementById('modalPoseImage').src = pose.image;
+            document.getElementById('modalPoseTitle').innerText = pose.name;
+            document.getElementById('modalPoseSynonyms').innerText = pose.synonyms ? `También conocida como: ${pose.synonyms}` : '';
+            document.getElementById('modalPoseDesc').innerText = pose.desc;
+            document.getElementById('modalPoseGrips').innerText = pose.grips;
+
+            const btn = document.getElementById('modalAchieveBtn');
+            if (pose.achieved) {
+                btn.className = "w-full bg-emerald-100 text-emerald-950 font-bold py-3.5 rounded-2xl text-xs shadow-md flex items-center justify-center gap-2";
+                btn.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Marcada como Dominada`;
+            } else {
+                btn.className = "w-full bg-pastel-violet text-purple-950 font-bold py-3.5 rounded-2xl text-xs shadow-md flex items-center justify-center gap-2";
+                btn.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i> Guardar en Mi Progreso`;
+            }
+
+            document.getElementById('poseDetailModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closePoseModal() {
+            document.getElementById('poseDetailModal').classList.add('hidden');
+        }
+
+        function toggleAchieveFromModal() {
+            const pose = glossaryData.find(p => p.id === activeModalPoseId);
+            if (pose) {
+                pose.achieved = !pose.achieved;
+                openPoseModal(activeModalPoseId);
+                renderGlossary(glossaryData);
+                renderUnlockedGallery();
+                updateProfileUI();
+            }
+        }
+
+        // COMMUNITY & FEED
+        function switchCommunityTab(tab) {
+            ['social', 'ayuda', 'tutoriales'].forEach(t => {
+                const btn = document.getElementById('commTab-' + t);
+                if (btn) {
+                    if (t === tab) {
+                        btn.className = "py-2 rounded-xl text-purple-950 bg-white shadow-sm font-extrabold";
+                    } else {
+                        btn.className = "py-2 rounded-xl text-gray-500 font-bold";
+                    }
+                }
+            });
+            renderCommunityFeed(tab);
+        }
+
+        function renderCommunityFeed(category) {
+            const feed = document.getElementById('communityFeed');
+            if (!feed) return;
+            feed.innerHTML = '';
+
+            const filtered = communityPosts.filter(p => p.category === category);
+
+            if (filtered.length === 0) {
+                feed.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">No hay publicaciones en esta sección aún.</p>';
+                return;
+            }
+
+            filtered.forEach(post => {
+                const card = document.createElement('div');
+                card.className = "soft-card p-4 space-y-3";
+                
+                let mediaHtml = post.image ? `<div class="rounded-2xl overflow-hidden bg-gray-100 max-h-60"><img src="${post.image}" class="w-full h-full object-cover"></div>` : '';
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2.5 cursor-pointer" onclick="openUserProfilePreview('${post.handle}')">
+                            <img src="${post.avatar}" class="w-9 h-9 rounded-full object-cover">
+                            <div>
+                                <h4 class="text-xs font-bold text-gray-900">${post.author}</h4>
+                                <span class="text-[10px] text-gray-400 font-medium">${post.handle}</span>
+                            </div>
+                        </div>
+                        <button onclick="openReportModal('post', ${post.id})" class="text-gray-300 hover:text-rose-500 p-1" title="Reportar">
+                            <i data-lucide="flag" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
+                    <p class="text-xs text-gray-700 leading-relaxed">${post.text}</p>
+                    ${mediaHtml}
+
+                    <div class="flex justify-between items-center border-t border-gray-100 pt-2.5 text-xs">
+                        <div class="flex gap-4 items-center">
+                            <button onclick="togglePostLike(${post.id})" class="flex items-center gap-1 font-bold ${post.liked ? 'text-rose-500' : 'text-gray-400'}">
+                                <i data-lucide="heart" class="w-4 h-4 ${post.liked ? 'fill-current' : ''}"></i> ${post.likes}
+                            </button>
+                            <button onclick="openCommentsModal(${post.id})" class="flex items-center gap-1 text-gray-400 font-bold">
+                                <i data-lucide="message-square" class="w-4 h-4"></i> ${post.comments.length}
+                            </button>
+                        </div>
+                        <button onclick="savePostToProfile(${post.id})" class="text-purple-900 font-bold text-[11px] flex items-center gap-1">
+                            <i data-lucide="bookmark" class="w-3.5 h-3.5"></i> Guardar
+                        </button>
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function togglePostLike(postId) {
+            const post = communityPosts.find(p => p.id === postId);
+            if (post) {
+                post.liked = !post.liked;
+                post.likes += post.liked ? 1 : -1;
+                renderCommunityFeed(post.category);
+            }
+        }
+
+        function openNewPostModal() {
+            document.getElementById('newPostModal').classList.remove('hidden');
+        }
+
+        function closeNewPostModal() {
+            document.getElementById('newPostModal').classList.add('hidden');
+            document.getElementById('postContent').value = '';
+            clearPostPreview();
+        }
+
+        function clearPostPreview() {
+            document.getElementById('postPreviewContainer').classList.add('hidden');
+            document.getElementById('postPreviewImg').src = '';
+        }
+
+        function submitNewPost() {
+            const content = document.getElementById('postContent').value.trim();
+            const category = document.getElementById('postCategorySelect').value;
+            const imgSrc = document.getElementById('postPreviewImg').src;
+
+            if (!content && !imgSrc) {
+                alert("Escribe un mensaje o adjunta una imagen.");
+                return;
+            }
+
+            const newPost = {
+                id: Date.now(),
+                author: userProfile.name,
+                handle: userProfile.handle,
+                avatar: userProfile.avatar,
+                category: category,
+                text: content,
+                image: imgSrc.startsWith('data:') || imgSrc.startsWith('http') ? imgSrc : null,
+                likes: 0,
+                comments: []
+            };
+
+            communityPosts.unshift(newPost);
+            closeNewPostModal();
+            switchCommunityTab(category);
+        }
+
+        function openCommentsModal(postId) {
+            activeCommentPostId = postId;
+            const post = communityPosts.find(p => p.id === postId);
+            if (!post) return;
+
+            const list = document.getElementById('commentsList');
+            list.innerHTML = '';
+
+            if (post.comments.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">Sé la primera en comentar ✨</p>';
+            } else {
+                post.comments.forEach(c => {
+                    const item = document.createElement('div');
+                    item.className = "bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-xs space-y-1";
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-purple-950">${c.author}</span>
+                            <span class="text-[9px] text-gray-400">${c.time || 'Reciente'}</span>
+                        </div>
+                        <p class="text-gray-700">${c.text}</p>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+
+            document.getElementById('commentsModal').classList.remove('hidden');
+        }
+
+        function closeCommentsModal() {
+            document.getElementById('commentsModal').classList.add('hidden');
+        }
+
+        function submitComment() {
+            const input = document.getElementById('newCommentInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const post = communityPosts.find(p => p.id === activeCommentPostId);
+            if (post) {
+                post.comments.push({
+                    author: userProfile.name,
+                    text: text,
+                    time: "Ahora"
+                });
+                input.value = '';
+                openCommentsModal(activeCommentPostId);
+                renderCommunityFeed(post.category);
+            }
+        }
+
+        function savePostToProfile(postId) {
+            const post = communityPosts.find(p => p.id === postId);
+            if (post && !userProfile.savedPosts.some(s => s.id === postId)) {
+                userProfile.savedPosts.push(post);
+                alert("Publicación guardada en tu perfil ✨");
+            } else {
+                alert("Esta publicación ya estaba guardada.");
+            }
+        }
+
+        // PROFILE & GALLERY
+        function updateProfileUI() {
+            document.getElementById('profileNameDisplay').innerText = userProfile.name;
+            document.getElementById('profileHandleDisplay').innerText = userProfile.handle;
+            document.getElementById('profileRoleTag').innerText = userProfile.role || "Practicante";
+            document.getElementById('profileBioDisplay').innerText = userProfile.bio;
+            document.getElementById('profileLevelBadge').innerText = "Nivel: " + userProfile.level;
+            document.getElementById('profileStyleBadge').innerText = "Estilo: " + userProfile.style;
+            document.getElementById('profileAvatarImg').src = userProfile.avatar;
+            document.getElementById('homeAvatarImg').src = userProfile.avatar;
+
+            const studiosContainer = document.getElementById('profileStudiosList');
+            if (studiosContainer) {
+                studiosContainer.innerHTML = '';
+                userProfile.studios.forEach(s => {
+                    const tag = document.createElement('span');
+                    tag.className = "bg-white border border-teal-200 text-teal-900 text-[10px] font-bold px-2 py-0.5 rounded-lg";
+                    tag.innerText = s;
+                    studiosContainer.appendChild(tag);
+                });
+            }
+
+            const achievedCount = glossaryData.filter(g => g.achieved).length;
+            document.getElementById('homePoseCount').innerText = achievedCount;
+            document.getElementById('profilePosesCountDisplay').innerText = `${achievedCount} Poses`;
+            document.getElementById('totalAchievedText').innerText = `${achievedCount} Poses`;
+        }
+
+        function switchProfileGalleryTab(cat) {
+            ['practices', 'outfits', 'tutorials'].forEach(c => {
+                const btn = document.getElementById('profGalTab-' + c);
+                if (btn) {
+                    if (c === cat) {
+                        btn.className = "py-1.5 rounded-lg bg-white text-purple-950 shadow-sm font-bold";
+                    } else {
+                        btn.className = "py-1.5 rounded-lg text-gray-500 font-bold";
+                    }
+                }
+            });
+            renderProfileGalleryGrid(cat);
+        }
+
+        function renderProfileGalleryGrid(category) {
+            const grid = document.getElementById('profileGalleryGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const filtered = profileMediaGallery.filter(m => m.category === category);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p class="text-xs text-gray-400 text-center col-span-2 py-4">No has subido contenido a esta categoría.</p>';
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "rounded-2xl overflow-hidden bg-gray-100 relative h-32 cursor-pointer shadow-sm group";
+                card.onclick = () => openFullscreenMediaModal(item.image, item.title, item.category);
+                card.innerHTML = `
+                    <img src="${item.image}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-2 flex items-end">
+                        <span class="text-white text-[10px] font-bold truncate">${item.title}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openFullscreenMediaModal(src, title, category) {
+            activeFullscreenImageSrc = src;
+            document.getElementById('fullscreenImg').src = src;
+            document.getElementById('fullscreenTitle').innerText = title;
+            document.getElementById('fullscreenMediaCategory').innerText = category;
+            
+            const shareBtn = document.getElementById('fullscreenShareBtn');
+            shareBtn.onclick = () => {
+                closeFullscreenMediaModal();
+                openNewPostModal();
+                document.getElementById('postPreviewImg').src = src;
+                document.getElementById('postPreviewContainer').classList.remove('hidden');
+                document.getElementById('postContent').value = `Mi avance de ${title} ✨`;
+            };
+
+            document.getElementById('fullscreenMediaModal').classList.remove('hidden');
+        }
+
+        function closeFullscreenMediaModal() {
+            document.getElementById('fullscreenMediaModal').classList.add('hidden');
+        }
+
+        function downloadActiveGalleryImage() {
+            if (!activeFullscreenImageSrc) return;
+            const a = document.createElement('a');
+            a.href = activeFullscreenImageSrc;
+            a.download = "polerise-media.jpg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function openProfileMediaUploadModal() {
+            document.getElementById('profileMediaModal').classList.remove('hidden');
+        }
+
+        function closeProfileMediaModal() {
+            document.getElementById('profileMediaModal').classList.add('hidden');
+        }
+
+        function saveProfileMediaItem() {
+            const cat = document.getElementById('mediaCategorySelect').value;
+            const title = document.getElementById('mediaTitleInput').value.trim() || "Nueva foto";
+            const img = document.getElementById('profileMediaPreviewImg').src;
+
+            if (!img || img.endsWith('index.html')) {
+                alert("Selecciona o captura una imagen.");
+                return;
+            }
+
+            profileMediaGallery.unshift({
+                id: Date.now(),
+                category: cat,
+                title: title,
+                image: img
+            });
+
+            closeProfileMediaModal();
+            switchProfileGalleryTab(cat);
+        }
+
+        function handleImageUpload(event, targetImgId) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById(targetImgId);
+                if (img) img.src = e.target.result;
+
+                const container = img.parentElement;
+                if (container) container.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // EDIT PROFILE MODAL
+        function openProfileEditModal() {
+            document.getElementById('editAvatarPreview').src = userProfile.avatar;
+            document.getElementById('editNameInput').value = userProfile.name;
+            document.getElementById('editHandleInput').value = userProfile.handle;
+            document.getElementById('editRoleInput').value = userProfile.role;
+            document.getElementById('editBioInput').value = userProfile.bio;
+            document.getElementById('editLevelInput').value = userProfile.level;
+            document.getElementById('editStyleInput').value = userProfile.style;
+
+            renderEditStudiosFields();
+            document.getElementById('profileEditModal').classList.remove('hidden');
+        }
+
+        function closeProfileEditModal() {
+            document.getElementById('profileEditModal').classList.add('hidden');
+        }
+
+        function renderEditStudiosFields() {
+            const container = document.getElementById('editStudiosContainer');
+            container.innerHTML = '';
+            userProfile.studios.forEach((s, idx) => {
+                const row = document.createElement('div');
+                row.className = "flex gap-2 items-center";
+                row.innerHTML = `
+                    <input type="text" value="${s}" class="studio-input flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs">
+                    <button onclick="removeStudioInputField(${idx})" class="text-rose-500 hover:bg-rose-50 p-1.5 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                `;
+                container.appendChild(row);
+            });
+            lucide.createIcons();
+        }
+
+        function addStudioInputField() {
+            userProfile.studios.push("");
+            renderEditStudiosFields();
+        }
+
+        function removeStudioInputField(idx) {
+            userProfile.studios.splice(idx, 1);
+            renderEditStudiosFields();
+        }
+
+        function saveUserProfile() {
+            userProfile.name = document.getElementById('editNameInput').value;
+            userProfile.handle = document.getElementById('editHandleInput').value;
+            userProfile.role = document.getElementById('editRoleInput').value;
+            userProfile.bio = document.getElementById('editBioInput').value;
+            userProfile.level = document.getElementById('editLevelInput').value;
+            userProfile.style = document.getElementById('editStyleInput').value;
+
+            const avatarPreview = document.getElementById('editAvatarPreview').src;
+            if (avatarPreview) userProfile.avatar = avatarPreview;
+
+            const studioInputs = document.querySelectorAll('.studio-input');
+            userProfile.studios = Array.from(studioInputs).map(i => i.value.trim()).filter(Boolean);
+
+            updateProfileUI();
+            closeProfileEditModal();
+        }
+
+        // SAVED POSTS MODAL
+        function openSavedPostsModal() {
+            const list = document.getElementById('savedPostsList');
+            list.innerHTML = '';
+
+            if (userProfile.savedPosts.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">No tienes publicaciones guardadas.</p>';
+            } else {
+                userProfile.savedPosts.forEach(post => {
+                    const card = document.createElement('div');
+                    card.className = "soft-card p-3 space-y-2 text-xs";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-purple-950">${post.author}</span>
+                            <span class="text-[10px] text-gray-400">${post.handle}</span>
+                        </div>
+                        <p class="text-gray-700">${post.text}</p>
+                    `;
+                    list.appendChild(card);
+                });
+            }
+
+            document.getElementById('savedPostsModal').classList.remove('hidden');
+        }
+
+        function closeSavedPostsModal() {
+            document.getElementById('savedPostsModal').classList.add('hidden');
+        }
+
+        // PROGRESS & ROUTINES
+        function switchProgressSubTab(subTab) {
+            document.getElementById('progressSubView-routines').classList.toggle('hidden', subTab !== 'routines');
+            document.getElementById('progressSubView-achievements').classList.toggle('hidden', subTab !== 'achievements');
+
+            const btnRoutines = document.getElementById('progSubTab-routines');
+            const btnAchievements = document.getElementById('progSubTab-achievements');
+
+            if (subTab === 'routines') {
+                btnRoutines.className = "py-2 rounded-xl text-purple-950 bg-white shadow-sm font-extrabold transition-all";
+                btnAchievements.className = "py-2 rounded-xl text-gray-500 font-bold transition-all";
+            } else {
+                btnAchievements.className = "py-2 rounded-xl text-purple-950 bg-white shadow-sm font-extrabold transition-all";
+                btnRoutines.className = "py-2 rounded-xl text-gray-500 font-bold transition-all";
+                initProgressChart();
+            }
+        }
+
+        function renderCustomRoutinesList() {
+            const container = document.getElementById('customRoutinesList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (customRoutinesData.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">No has creado rutinas personalizadas aún.</p>';
+                return;
+            }
+
+            customRoutinesData.forEach(r => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-2xl border border-purple-100 shadow-sm flex items-center justify-between text-xs";
+                card.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-gray-900">${r.name}</h4>
+                        <div class="flex gap-1 mt-1">
+                            ${r.techs.map(t => `<span class="bg-purple-50 text-purple-900 text-[9px] font-bold px-2 py-0.5 rounded-full">${t}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="flex gap-1.5">
+                        <button onclick="startWorkoutRoutine('${r.name}')" class="bg-purple-950 text-white p-2 rounded-xl" title="Iniciar">
+                            <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function openCustomRoutineModal() {
+            const list = document.getElementById('routinePosesSelectionList');
+            list.innerHTML = '';
+            glossaryData.forEach(pose => {
+                const row = document.createElement('label');
+                row.className = "flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer text-xs";
+                row.innerHTML = `
+                    <input type="checkbox" name="routinePose" value="${pose.id}" class="accent-purple-700">
+                    <span class="font-medium">${pose.name}</span>
+                `;
+                list.appendChild(row);
+            });
+
+            document.getElementById('customRoutineModal').classList.remove('hidden');
+        }
+
+        function closeCustomRoutineModal() {
+            document.getElementById('customRoutineModal').classList.add('hidden');
+        }
+
+        function saveCustomRoutine() {
+            const name = document.getElementById('routineNameInput').value.trim();
+            if (!name) {
+                alert("Asigna un nombre a tu rutina.");
+                return;
+            }
+
+            const techs = Array.from(document.querySelectorAll('input[name="routineTech"]:checked')).map(i => i.value);
+            const warmup = document.getElementById('routineWarmupToggle').checked;
+            const poseIds = Array.from(document.querySelectorAll('input[name="routinePose"]:checked')).map(i => parseInt(i.value));
+
+            customRoutinesData.push({
+                id: Date.now(),
+                name: name,
+                techs: techs,
+                warmup: warmup,
+                poses: poseIds
+            });
+
+            closeCustomRoutineModal();
+            renderCustomRoutinesList();
+        }
+
+        function renderUnlockedGallery() {
+            const container = document.getElementById('unlockedGallery');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const unlocked = glossaryData.filter(g => g.achieved);
+
+            if (unlocked.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center col-span-2 py-4">Aún no has marcado ninguna pose como dominada.</p>';
+                return;
+            }
+
+            unlocked.forEach(pose => {
+                const card = document.createElement('div');
+                card.className = "soft-card p-2.5 space-y-1.5 cursor-pointer hover:border-purple-200 border border-transparent transition";
+                card.onclick = () => openPoseModal(pose.id);
+                card.innerHTML = `
+                    <div class="h-28 rounded-xl overflow-hidden bg-gray-100">
+                        <img src="${pose.image}" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full inline-block">Dominada</span>
+                    <h5 class="text-xs font-bold text-gray-900 truncate">${pose.name}</h5>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function initProgressChart() {
+            const ctx = document.getElementById('progressChart');
+            if (!ctx) return;
+
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+                    datasets: [{
+                        label: 'Poses Dominadas',
+                        data: [1, 2, 2, 3],
+                        borderColor: '#5B3B83',
+                        backgroundColor: 'rgba(200, 182, 255, 0.3)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } }
+                    }
+                }
+            });
+        }
+
+        function toggleDetailedAnalyticsModal() {
+            const modal = document.getElementById('analyticsModal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                initDetailedAnalyticsChart();
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function initDetailedAnalyticsChart() {
+            const ctx = document.getElementById('detailedCategoryChart');
+            if (!ctx) return;
+
+            if (detailedChartInstance) detailedChartInstance.destroy();
+
+            detailedChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Flexibilidad', 'Spin', 'Estático', 'Inversiones'],
+                    datasets: [{
+                        data: [35, 25, 20, 20],
+                        backgroundColor: ['#C8B6FF', '#FFC2D1', '#BEE1E6', '#5B3B83']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+                }
+            });
+        }
+
+        // WORKOUT RUNNER & TIMERS
+        function startWorkoutRoutine(title) {
+            document.getElementById('routineTitleDisplay').innerText = title;
+            currentWorkoutStepIndex = 0;
+            currentWorkoutStage = "warmup";
+
+            document.getElementById('warmupPlayerCard').classList.remove('hidden');
+            document.getElementById('polePracticePlayerCard').classList.add('hidden');
+
+            setupWarmupStep(0);
+            document.getElementById('workoutModal').classList.remove('hidden');
+        }
+
+        function startFreePoleSession() {
+            document.getElementById('routineTitleDisplay').innerText = "Práctica Libre en Barra";
+            currentWorkoutStage = "pole";
+
+            document.getElementById('warmupPlayerCard').classList.add('hidden');
+            document.getElementById('polePracticePlayerCard').classList.remove('hidden');
+
+            populateActiveMoveSelector();
+            startPracticeStopwatch();
+
+            document.getElementById('workoutModal').classList.remove('hidden');
+        }
+
+        function setupWarmupStep(index) {
+            const step = warmupStepsSequence[index];
+            document.getElementById('stepProgressBadge').innerText = `Paso ${index + 1} de ${warmupStepsSequence.length}`;
+            document.getElementById('stepName').innerText = step.name;
+            document.getElementById('stepDescription').innerText = step.desc;
+
+            workoutTimeRemaining = step.duration;
+            updateTimerDisplay();
+
+            clearInterval(workoutTimerInterval);
+            workoutIsPaused = false;
+            workoutTimerInterval = setInterval(() => {
+                if (!workoutIsPaused) {
+                    workoutTimeRemaining--;
+                    updateTimerDisplay();
+                    if (workoutTimeRemaining <= 0) {
+                        nextWorkoutStep();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(workoutTimeRemaining / 60);
+            const secs = workoutTimeRemaining % 60;
+            document.getElementById('routineTimerDisplay').innerText = 
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function toggleWorkoutTimer() {
+            workoutIsPaused = !workoutIsPaused;
+            const icon = document.querySelector('#playPauseBtn i');
+            if (icon) icon.setAttribute('data-lucide', workoutIsPaused ? 'play' : 'pause');
+            lucide.createIcons();
+        }
+
+        function nextWorkoutStep() {
+            if (currentWorkoutStepIndex < warmupStepsSequence.length - 1) {
+                currentWorkoutStepIndex++;
+                setupWarmupStep(currentWorkoutStepIndex);
+            } else {
+                // Transition to pole practice stage
+                currentWorkoutStage = "pole";
+                document.getElementById('warmupPlayerCard').classList.add('hidden');
+                document.getElementById('polePracticePlayerCard').classList.remove('hidden');
+                populateActiveMoveSelector();
+                startPracticeStopwatch();
+            }
+        }
+
+        function prevWorkoutStep() {
+            if (currentWorkoutStepIndex > 0) {
+                currentWorkoutStepIndex--;
+                setupWarmupStep(currentWorkoutStepIndex);
+            }
+        }
+
+        function populateActiveMoveSelector() {
+            const select = document.getElementById('activeMoveSelector');
+            select.innerHTML = '';
+            glossaryData.forEach(pose => {
+                const opt = document.createElement('option');
+                opt.value = pose.id;
+                opt.innerText = pose.name;
+                select.appendChild(opt);
+            });
+            updateActivePoseDisplayCard();
+        }
+
+        function updateActivePoseDisplayCard() {
+            const id = parseInt(document.getElementById('activeMoveSelector').value);
+            const pose = glossaryData.find(p => p.id === id);
+            if (pose) {
+                document.getElementById('activePoseImg').src = pose.image;
+                document.getElementById('activePoseName').innerText = pose.name;
+                document.getElementById('activePoseLevelTag').innerText = pose.difficulty;
+                document.getElementById('activePoseGrips').innerText = pose.grips;
+                document.getElementById('activePoseDesc').innerText = pose.desc;
+            }
+        }
+
+        function setPoleType(type) {
+            activePoleType = type;
+            const staticBtn = document.getElementById('poleTypeStaticBtn');
+            const spinBtn = document.getElementById('poleTypeSpinBtn');
+
+            if (type === 'Estatico') {
+                staticBtn.className = "py-1.5 px-3 rounded-xl text-xs font-bold bg-purple-950 text-white shadow-sm";
+                spinBtn.className = "py-1.5 px-3 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200";
+            } else {
+                spinBtn.className = "py-1.5 px-3 rounded-xl text-xs font-bold bg-purple-950 text-white shadow-sm";
+                staticBtn.className = "py-1.5 px-3 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200";
+            }
+        }
+
+        function startPracticeStopwatch() {
+            stopwatchSeconds = 0;
+            stopwatchIsRunning = true;
+            clearInterval(stopwatchInterval);
+
+            stopwatchInterval = setInterval(() => {
+                if (stopwatchIsRunning) {
+                    stopwatchSeconds++;
+                    const hrs = Math.floor(stopwatchSeconds / 3600);
+                    const mins = Math.floor((stopwatchSeconds % 3600) / 60);
+                    const secs = stopwatchSeconds % 60;
+                    document.getElementById('livePracticeStopwatch').innerText = 
+                        `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        function togglePracticeStopwatch() {
+            stopwatchIsRunning = !stopwatchIsRunning;
+        }
+
+        function finishWorkoutRoutine() {
+            clearInterval(workoutTimerInterval);
+            clearInterval(stopwatchInterval);
+            document.getElementById('workoutModal').classList.add('hidden');
+
+            const countEl = document.getElementById('completedRoutinesCount');
+            if (countEl) {
+                const current = parseInt(countEl.innerText) || 0;
+                countEl.innerText = current + 1;
+            }
+
+            alert("¡Excelente sesión! Tu tiempo y esfuerzo han sido registrados en tu avance ✨");
+        }
+
+        function closeWorkoutModal() {
+            clearInterval(workoutTimerInterval);
+            clearInterval(stopwatchInterval);
+            document.getElementById('workoutModal').classList.add('hidden');
+        }
+
+        // SUGGESTIONS & REPORTING
+        function openSuggestionModal() {
+            document.getElementById('suggestionModal').classList.remove('hidden');
+        }
+
+        function closeSuggestionModal() {
+            document.getElementById('suggestionModal').classList.add('hidden');
+            document.getElementById('suggestionText').value = '';
+        }
+
+        function submitSuggestion() {
+            const text = document.getElementById('suggestionText').value.trim();
+            if (!text) return;
+
+            adminSuggestions.push({
+                user: userProfile.name,
+                handle: userProfile.handle,
+                text: text,
+                time: "Reciente"
+            });
+
+            closeSuggestionModal();
+            alert("¡Gracias! Tu sugerencia ha sido enviada directamente al desarrollador 💕");
+        }
+
+        function openReportModal(type, targetId) {
+            document.getElementById('reportTargetType').value = type;
+            document.getElementById('reportTargetId').value = targetId;
+            document.getElementById('reportModal').classList.remove('hidden');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.add('hidden');
+        }
+
+        function submitReport() {
+            const type = document.getElementById('reportTargetType').value;
+            const targetId = document.getElementById('reportTargetId').value;
+            const reason = document.getElementById('reportReasonSelect').value;
+            const notes = document.getElementById('reportNotesInput').value.trim();
+
+            adminReports.push({
+                type: type,
+                targetId: targetId,
+                reason: reason,
+                notes: notes,
+                reportedBy: userProfile.handle
+            });
+
+            closeReportModal();
+            alert("Reporte enviado con éxito. La administración revisará este contenido a la brevedad.");
+        }
+
+        // ONBOARDING GUIDE
+        let onboardingStep = 1;
+        function openOnboardingModal() {
+            onboardingStep = 1;
+            updateOnboardingUI();
+            document.getElementById('onboardingModal').classList.remove('hidden');
+        }
+
+        function closeOnboardingModal() {
+            document.getElementById('onboardingModal').classList.add('hidden');
+        }
+
+        function nextOnboardingStep() {
+            if (onboardingStep < 4) {
+                onboardingStep++;
+                updateOnboardingUI();
+            } else {
+                closeOnboardingModal();
+            }
+        }
+
+        function prevOnboardingStep() {
+            if (onboardingStep > 1) {
+                onboardingStep--;
+                updateOnboardingUI();
+            }
+        }
+
+        function updateOnboardingUI() {
+            const badge = document.getElementById('onboardingStepBadge');
+            const title = document.getElementById('onboardingTitle');
+            const body = document.getElementById('onboardingBody');
+            const prevBtn = document.getElementById('onboardingPrevBtn');
+            const nextBtn = document.getElementById('onboardingNextBtn');
+
+            badge.innerText = `Paso ${onboardingStep} de 4`;
+            prevBtn.classList.toggle('hidden', onboardingStep === 1);
+
+            if (onboardingStep === 1) {
+                title.innerText = "Bienvenida a PoleRise ✨";
+                body.innerText = "Tu espacio personalizado para registrar tu progreso en el tubo, guardar logros y conectar con otras Pole Sisters.";
+            } else if (onboardingStep === 2) {
+                title.innerText = "Crea & Entrena Rutinas 🏋️‍♀️";
+                body.innerText = "Organiza tus sesiones en la pestaña de Progreso. Puedes combinar calentamientos, pole estático, giratorio y flexibilidad.";
+            } else if (onboardingStep === 3) {
+                title.innerText = "Glosario de Poses & Puntos de Agarre 📖";
+                body.innerText = "Consulta figuras por nivel con imágenes y puntos clave de contacto para realizarlas de forma segura.";
+            } else if (onboardingStep === 4) {
+                title.innerText = "Comunidad & Amigas 💕";
+                body.innerText = "Comparte tus avances, pide consejos técnicos en la sección de Ayuda y chatea con tus amigas en privado.";
+                nextBtn.innerText = "¡Comenzar!";
+            }
+        }
+
+        // SECRET ADMIN / PASSCODE & IMPERSONATION LOGIC
+        function handleSecretLogoTap() {
+            logoTapCount++;
+            if (logoTapCount === 1) {
+                logoTapTimer = setTimeout(() => {
+                    logoTapCount = 0;
+                }, 2000);
+            } else if (logoTapCount >= 5) {
+                clearTimeout(logoTapTimer);
+                logoTapCount = 0;
+                openSecretPasscodeModal();
+            }
+        }
+
+        function openSecretPasscodeModal() {
+            document.getElementById('secretPasscodeInput').value = '';
+            document.getElementById('secretPasscodeError').classList.add('hidden');
+            document.getElementById('secretPasscodeModal').classList.remove('hidden');
+        }
+
+        function closeSecretPasscodeModal() {
+            document.getElementById('secretPasscodeModal').classList.add('hidden');
+        }
+
+        function submitSecretPasscode() {
+            const input = document.getElementById('secretPasscodeInput').value;
+            if (input === SECRET_PASSCODE) {
+                closeSecretPasscodeModal();
+                openSupportModal();
+            } else {
+                document.getElementById('secretPasscodeError').classList.remove('hidden');
+            }
+        }
+
+        function openSupportModal() {
+            renderAdminUsersList();
+            renderAdminReportsList();
+            renderAdminSuggestionsList();
+            document.getElementById('supportModal').classList.remove('hidden');
+        }
+
+        function closeSupportModal() {
+            document.getElementById('supportModal').classList.add('hidden');
+        }
+
+        function switchAdminTab(tab) {
+            ['reports', 'suggestions', 'usersCms', 'glossaryCms'].forEach(t => {
+                const btn = document.getElementById('adminTab-' + t);
+                const panel = document.getElementById('adminPanel-' + t);
+
+                if (btn && panel) {
+                    if (t === tab) {
+                        btn.className = "py-1.5 rounded-lg bg-white text-gray-900 shadow-sm font-bold";
+                        panel.classList.remove('hidden');
+                    } else {
+                        btn.className = "py-1.5 rounded-lg text-gray-500 font-bold";
+                        panel.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        function renderAdminUsersList() {
+            const container = document.getElementById('adminUsersList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            registeredUsers.forEach(user => {
+                const card = document.createElement('div');
+                card.className = "flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-xs";
+                card.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <img src="${user.avatar}" class="w-8 h-8 rounded-full object-cover">
+                        <div>
+                            <p class="font-bold text-gray-900">${user.name}</p>
+                            <p class="text-[10px] text-gray-400">${user.email}</p>
+                        </div>
+                    </div>
+                    <button onclick="impersonateUser('${user.email}')" class="bg-amber-500 hover:bg-amber-600 text-black font-extrabold px-3 py-1 rounded-lg text-[10px]">
+                        Entrar
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderAdminReportsList() {
+            const container = document.getElementById('adminReportsList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (adminReports.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Sin reportes registrados.</p>';
+                return;
+            }
+
+            adminReports.forEach((rep, idx) => {
+                const item = document.createElement('div');
+                item.className = "bg-rose-50 p-2.5 rounded-xl border border-rose-100 text-xs space-y-1";
+                item.innerHTML = `
+                    <div class="flex justify-between font-bold text-rose-950">
+                        <span>Tipo: ${rep.type}</span>
+                        <span>Por: ${rep.reportedBy}</span>
+                    </div>
+                    <p class="text-rose-800">Motivo: ${rep.reason}</p>
+                    <p class="text-[10px] text-rose-600">${rep.notes || 'Sin notas adicionales'}</p>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function renderAdminSuggestionsList() {
+            const container = document.getElementById('adminSuggestionsList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (adminSuggestions.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Sin sugerencias recibidas.</p>';
+                return;
+            }
+
+            adminSuggestions.forEach(sug => {
+                const item = document.createElement('div');
+                item.className = "bg-purple-50 p-2.5 rounded-xl border border-purple-100 text-xs space-y-1";
+                item.innerHTML = `
+                    <div class="flex justify-between font-bold text-purple-950">
+                        <span>${sug.user} (${sug.handle})</span>
+                        <span class="text-[9px] text-purple-400">${sug.time}</span>
+                    </div>
+                    <p class="text-purple-900">${sug.text}</p>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function impersonateUser(email) {
+            const targetUser = registeredUsers.find(u => u.email === email);
+            if (!targetUser) return;
+
+            originalAdminSession = { ...userProfile };
+
+            userProfile.name = targetUser.name;
+            userProfile.handle = targetUser.handle;
+            userProfile.email = targetUser.email;
+            userProfile.role = targetUser.role;
+            userProfile.level = targetUser.level;
+            userProfile.style = targetUser.style;
+            userProfile.avatar = targetUser.avatar;
+            userProfile.bio = targetUser.bio;
+
+            document.getElementById('impersonateUserEmail').innerText = targetUser.email;
+            document.getElementById('impersonateBanner').classList.remove('hidden');
+
+            closeSupportModal();
+            updateProfileUI();
+            switchTab('home');
+        }
+
+        function exitImpersonation() {
+            if (originalAdminSession) {
+                userProfile = { ...originalAdminSession };
+                originalAdminSession = null;
+            }
+
+            document.getElementById('impersonateBanner').classList.add('hidden');
+            updateProfileUI();
+            alert("Has salido del Modo Consulta.");
+        }
+    </script>
+</body>
+</html>
